@@ -1,21 +1,33 @@
-﻿namespace Calculator;
+﻿
+namespace Calculator;
+
+
+// TODO: add "," between hundreds as separation
+// TODO: putem folosi live charts ca sa intruducem o functie de tipul
+// vizualizare date sub forma de grafic
 
 public partial class MainPage : ContentPage
 {
-	double RetainedInput = 0;
+    double RetainedInput = 0;
     string Operation = string.Empty;
     const string ADD = "+";
     const string SUB = "-";
     const string MUL = "*";
     const string DIV = "/";
+    const string DivisionByZeroText = "Error: division by 0.";
 
     public MainPage()
-	{
-		InitializeComponent();
-	}
+    {
+        InitializeComponent();
+    }
 
-	private void btnBack_Clicked(object sender, EventArgs e)
-	{
+    private void btnBack_Clicked(object sender, EventArgs e)
+    {
+        if (entryResult.Text == DivisionByZeroText)
+        {
+            EnableAllButtons(true);
+        }
+
         int length = entryResult.Text.Length;
         string text;
 
@@ -31,27 +43,32 @@ public partial class MainPage : ContentPage
         entryResult.Text = text;
     }
 
-	private void btnClear_Clicked(object sender, EventArgs e)
-	{
-		entryCalculation.Text = string.Empty;
-		entryResult.Text = "0";
+    private void btnClear_Clicked(object sender, EventArgs e)
+    {
+        if (entryResult.Text == DivisionByZeroText)
+        {
+            EnableAllButtons(true);
+        }
+        
+        entryCalculation.Text = string.Empty;
+        entryResult.Text = "0";
         RetainedInput = 0;
         Operation = string.Empty;
     }
 
-	private void btn1PerX_Clicked(object sender, EventArgs e)
-	{
+    private void btn1PerX_Clicked(object sender, EventArgs e)
+    {
         entryCalculation.Text = $"1/{entryResult.Text}";
-        
-        if(double.TryParse(entryResult.Text, out double temp))
+
+        if (double.TryParse(entryResult.Text, out double temp))
         {
-            if(temp != 0)
+            if (temp != 0)
             {
                 entryResult.Text = $"{1 / temp}";
             }
             else
             {
-                // TODO: pop here a message
+                DivisionByZero();
             }
         }
     }
@@ -76,40 +93,32 @@ public partial class MainPage : ContentPage
 
     private void btn0_Clicked(object sender, EventArgs e) => AddDigit("0");
 
-    private void btnPlus_Clicked(object sender, EventArgs e)
-    {
-        BuildOperation("+");
-    }
+    private void btnPlus_Clicked(object sender, EventArgs e) => BuildOperation(ADD);
 
-    private void btnDivision_Clicked(object sender, EventArgs e) => BuildOperation("/");
+    private void btnDivision_Clicked(object sender, EventArgs e) => BuildOperation(DIV);
 
-    private void btnMult_Clicked(object sender, EventArgs e) => BuildOperation("x");
+    private void btnMult_Clicked(object sender, EventArgs e) => BuildOperation(MUL);
 
-    private void btnMinus_Clicked(object sender, EventArgs e) => BuildOperation("-");
-
-    private void btnMore_Clicked(object sender, EventArgs e)
-	{
-
-	}
+    private void btnMinus_Clicked(object sender, EventArgs e) => BuildOperation(SUB);
 
     private void btnDot_Clicked(object sender, EventArgs e)
-	{
-		if(!entryResult.Text.Contains('.'))
-		{
-			entryResult.Text += '.';
+    {
+        if (!entryResult.Text.Contains('.'))
+        {
+            entryResult.Text += '.';
         }
-	}
+    }
 
-	private void btnEqual_Clicked(object sender, EventArgs e)
-	{
-		if(double.TryParse(entryResult.Text, out double result))
-		{
-			switch(Operation)
+    private void btnEqual_Clicked(object sender, EventArgs e)
+    {
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            switch (Operation)
             {
                 case ADD:
                     entryResult.Text = $"{RetainedInput + result}";
 
-                    if(!entryCalculation.Text.Contains('='))
+                    if (!entryCalculation.Text.Contains('='))
                     {
                         entryCalculation.Text += $" {result} =";
                     }
@@ -126,14 +135,14 @@ public partial class MainPage : ContentPage
                     break;
 
                 case DIV:
-                    if(result != 0)
+                    if (result != 0)
                     {
                         entryResult.Text = $"{RetainedInput / result}";
                         entryCalculation.Text += $" {result} =";
                     }
                     else
                     {
-                        // TODO: pop here a message
+                        DivisionByZero();
                     }
                     break;
 
@@ -143,10 +152,10 @@ public partial class MainPage : ContentPage
 
             RetainedInput = 0;
             Operation = string.Empty;
-		}
+        }
 
         // the else case happens if user changes operator and presses equal
-	}
+    }
 
     private void BuildOperation(string in_operator)
     {
@@ -155,12 +164,12 @@ public partial class MainPage : ContentPage
             // this means equal was not pressed and another input is added
             if (Operation != string.Empty)
             {
-                switch(Operation)
+                switch (Operation)
                 {
-                    case ADD: entryResult.Text = $"{RetainedInput + temp}"; break;
-                    case SUB: entryResult.Text = $"{RetainedInput - temp}"; break;
-                    case MUL: entryResult.Text = $"{RetainedInput * temp}"; break;
-                    case DIV: entryResult.Text = $"{RetainedInput / temp}"; break;
+                    case ADD: entryResult.Text = $"{RetainedInput += temp}"; break;
+                    case SUB: entryResult.Text = $"{RetainedInput -= temp}"; break;
+                    case MUL: entryResult.Text = $"{RetainedInput *= temp}"; break;
+                    case DIV: entryResult.Text = $"{RetainedInput /= temp}"; break;
                 }
             }
             else
@@ -174,7 +183,7 @@ public partial class MainPage : ContentPage
         else
         {
             // means user changed mind about operator
-            if(entryCalculation.Text.Contains(" "))
+            if (entryCalculation.Text.Contains(" "))
             {
                 int length = entryCalculation.Text.Length;
                 entryCalculation.Text = entryCalculation.Text.Remove(length - 1) + in_operator;
@@ -184,12 +193,51 @@ public partial class MainPage : ContentPage
         Operation = in_operator;
     }
 
-	private void AddDigit(string digit)
-	{
+    private void AddDigit(string digit)
+    {
         if (entryResult.Text == "0")
+        {
             entryResult.Text = digit;
+        }            
+        else if(entryResult.Text == DivisionByZeroText)
+        {
+            btnClear_Clicked(null, null);
+            // must be before the clear click event 
+            entryResult.Text = digit;
+        }
         else
+        {
             entryResult.Text += digit;
+        }
+    }
+
+    private void DivisionByZero()
+    {
+        entryResult.Text = DivisionByZeroText;
+
+        EnableAllButtons(false);
+    }
+
+    private void EnableAllButtons(bool in_enable)
+    {
+        var buttons = new List<Button>
+        {
+            btn1PerX, btnDivision, btnDot, btnEqual, btnPlus, btnMinus, btnMult, btnDivision
+        };
+
+        foreach(var button in buttons)
+        {
+            button.IsEnabled = in_enable;
+
+            if(in_enable)
+            {
+                button.Opacity = 1;
+            }
+            else
+            {
+                button.Opacity = 0.5;
+            }
+        }
     }
 }
 
