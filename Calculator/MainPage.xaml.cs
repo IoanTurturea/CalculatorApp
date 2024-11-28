@@ -1,10 +1,14 @@
 ﻿
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
+using SkiaSharp;
+using System.Collections.ObjectModel;
+
 namespace Calculator;
 
 
 // TODO: add "," between hundreds as separation
-// TODO: putem folosi live charts ca sa intruducem o functie de tipul
-// vizualizare date sub forma de grafic
 
 public partial class MainPage : ContentPage
 {
@@ -15,10 +19,36 @@ public partial class MainPage : ContentPage
     const string MUL = "*";
     const string DIV = "/";
     const string DivisionByZeroText = "Error: division by 0.";
+    const string CHART_VIEW = "Chart";
+    const string TEXT_VIEW = "Text";
+    const string SCIENTIFIC_VIEW = "Scientific";
+    readonly ObservableCollection<double> LVCValues = new();
+    const int WindowLength = 100;
+
+    public ISeries[] Series { get; set; }
 
     public MainPage()
     {
         InitializeComponent();
+
+        Series = [
+            new LineSeries<double>
+            {
+                Values = LVCValues,
+                GeometryFill = null,
+                GeometryStroke = null,
+                LineSmoothness = 0,
+                Stroke = new SolidColorPaint(SKColors.Blue, 1)
+            }
+        ];
+
+        pickerView.SelectedIndex = 0;
+
+        entryResult.Text = "0";
+
+        pickerView.ItemsSource = new List<string>() { TEXT_VIEW, CHART_VIEW, SCIENTIFIC_VIEW };
+
+        BindingContext = this;
     }
 
     private void btnBack_Clicked(object sender, EventArgs e)
@@ -54,6 +84,7 @@ public partial class MainPage : ContentPage
         entryResult.Text = "0";
         RetainedInput = 0;
         Operation = string.Empty;
+        LVCValues.Clear();
     }
 
     private void btn1PerX_Clicked(object sender, EventArgs e)
@@ -111,34 +142,40 @@ public partial class MainPage : ContentPage
 
     private void btnEqual_Clicked(object sender, EventArgs e)
     {
-        if (double.TryParse(entryResult.Text, out double result))
+        if (double.TryParse(entryResult.Text, out double parsedText))
         {
+            double result = 0;
+
             switch (Operation)
             {
                 case ADD:
-                    entryResult.Text = $"{RetainedInput + result}";
+                    result = RetainedInput + parsedText;
+                    entryResult.Text = $"{result}";
 
                     if (!entryCalculation.Text.Contains('='))
                     {
-                        entryCalculation.Text += $" {result} =";
+                        entryCalculation.Text += $" {parsedText} =";
                     }
                     break;
 
                 case SUB:
-                    entryResult.Text = $"{RetainedInput - result}";
-                    entryCalculation.Text += $" {result} =";
+                    result = RetainedInput - parsedText;
+                    entryResult.Text = $"{result}";
+                    entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case MUL:
-                    entryResult.Text = $"{RetainedInput * result}";
-                    entryCalculation.Text += $" {result} =";
+                    result = RetainedInput * parsedText;
+                    entryResult.Text = $"{result}";
+                    entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case DIV:
-                    if (result != 0)
+                    if (parsedText != 0)
                     {
-                        entryResult.Text = $"{RetainedInput / result}";
-                        entryCalculation.Text += $" {result} =";
+                        result = RetainedInput / parsedText;
+                        entryResult.Text = $"{result}";
+                        entryCalculation.Text += $" {parsedText} =";
                     }
                     else
                     {
@@ -152,9 +189,17 @@ public partial class MainPage : ContentPage
 
             RetainedInput = 0;
             Operation = string.Empty;
+
+            LVCValues.Add(result);
+
+            if(LVCValues.Count > WindowLength)
+            {
+                LVCValues.RemoveAt(0);
+            }
         }
 
-        // the else case happens if user changes operator and presses equal
+        // the else case happens if user changes operator (+, -, *, /) and presses equal
+        // which does nothing
     }
 
     private void BuildOperation(string in_operator)
@@ -237,6 +282,53 @@ public partial class MainPage : ContentPage
             {
                 button.Opacity = 0.5;
             }
+        }
+    }
+
+    private void pickerView_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var item = pickerView.ItemsSource[pickerView.SelectedIndex];
+
+        switch(item)
+        {
+            case CHART_VIEW:
+                entryResult.IsVisible = false;
+                gridChart.IsVisible = true;
+
+                rowDisplay.Height = new GridLength(1.5, GridUnitType.Star);
+                rowInput.Height = new GridLength(1, GridUnitType.Star);
+                break;
+
+            case TEXT_VIEW:
+                entryResult.IsVisible = true;
+                gridChart.IsVisible = false;
+
+                rowDisplay.Height = new GridLength(1, GridUnitType.Star);
+                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
+                break;
+
+            case SCIENTIFIC_VIEW:
+                break;
+        }
+    }
+
+    private void entryResult_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        var entry = sender as Entry;
+
+        if(entry?.Text == "0")
+        {
+            btn1PerX.IsEnabled = false;
+            btnBack.IsEnabled = false;
+            btn1PerX.Opacity = 0.5;
+            btnBack.Opacity = 0.5;
+        }
+        else
+        {
+            btn1PerX.IsEnabled = true;
+            btnBack.IsEnabled = true;
+            btn1PerX.Opacity = 1;
+            btnBack.Opacity = 1;
         }
     }
 }

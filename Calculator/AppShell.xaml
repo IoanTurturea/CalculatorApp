@@ -7,10 +7,9 @@
     Shell.FlyoutBehavior="Disabled"
     MaximumWidthRequest="300">
 
-    <ShellContent
-        Title="Standard"
-        Shell.NavBarIsVisible="False" 
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage"/>
+    <ShellContent Title="Simple view"
+                      Shell.NavBarIsVisible="False" 
+                      ContentTemplate="{DataTemplate local:MainPage}"
+                      Route="MainPage"/>
 
 </Shell>
