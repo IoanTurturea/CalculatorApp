@@ -22,7 +22,7 @@ public partial class MainPage : ContentPage
     const string CHART_VIEW = "Chart";
     const string TEXT_VIEW = "Text";
     const string SCIENTIFIC_VIEW = "Scientific";
-    readonly ObservableCollection<double> LVCValues = new();
+    readonly ObservableCollection<double> LVCValues = new() { 0};
     const int WindowLength = 100;
 
     public ISeries[] Series { get; set; }
@@ -42,11 +42,15 @@ public partial class MainPage : ContentPage
             }
         ];
 
-        pickerView.SelectedIndex = 0;
-
         entryResult.Text = "0";
 
         pickerView.ItemsSource = new List<string>() { TEXT_VIEW, CHART_VIEW, SCIENTIFIC_VIEW };
+        pickerView.SelectedIndex = 0;
+
+        // hide buttons for scientific view:
+        //rowScientific0.Height = new GridLength(0);
+        //rowScientific1.Height = new GridLength(0);
+        //columnScientificLeft.Width = new GridLength(0);
 
         BindingContext = this;
     }
@@ -95,7 +99,7 @@ public partial class MainPage : ContentPage
         {
             if (temp != 0)
             {
-                entryResult.Text = $"{1 / temp}";
+                entryResult.Text = $"{1 / temp:n}";
             }
             else
             {
@@ -150,7 +154,7 @@ public partial class MainPage : ContentPage
             {
                 case ADD:
                     result = RetainedInput + parsedText;
-                    entryResult.Text = $"{result}";
+                    entryResult.Text = result.ToString("#,##0.##########");
 
                     if (!entryCalculation.Text.Contains('='))
                     {
@@ -160,13 +164,13 @@ public partial class MainPage : ContentPage
 
                 case SUB:
                     result = RetainedInput - parsedText;
-                    entryResult.Text = $"{result}";
+                    entryResult.Text = $"{result:n}";
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case MUL:
                     result = RetainedInput * parsedText;
-                    entryResult.Text = $"{result}";
+                    entryResult.Text = $"{result:n}";
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
@@ -174,7 +178,7 @@ public partial class MainPage : ContentPage
                     if (parsedText != 0)
                     {
                         result = RetainedInput / parsedText;
-                        entryResult.Text = $"{result}";
+                        entryResult.Text = $"{result:n}";
                         entryCalculation.Text += $" {parsedText} =";
                     }
                     else
@@ -211,10 +215,10 @@ public partial class MainPage : ContentPage
             {
                 switch (Operation)
                 {
-                    case ADD: entryResult.Text = $"{RetainedInput += temp}"; break;
-                    case SUB: entryResult.Text = $"{RetainedInput -= temp}"; break;
-                    case MUL: entryResult.Text = $"{RetainedInput *= temp}"; break;
-                    case DIV: entryResult.Text = $"{RetainedInput /= temp}"; break;
+                    case ADD: entryResult.Text = $"{RetainedInput += temp:n}"; break;
+                    case SUB: entryResult.Text = $"{RetainedInput -= temp:n}"; break;
+                    case MUL: entryResult.Text = $"{RetainedInput *= temp:n}"; break;
+                    case DIV: entryResult.Text = $"{RetainedInput /= temp:n}"; break;
                 }
             }
             else
@@ -238,24 +242,6 @@ public partial class MainPage : ContentPage
         Operation = in_operator;
     }
 
-    private void AddDigit(string digit)
-    {
-        if (entryResult.Text == "0")
-        {
-            entryResult.Text = digit;
-        }            
-        else if(entryResult.Text == DivisionByZeroText)
-        {
-            btnClear_Clicked(null, null);
-            // must be before the clear click event 
-            entryResult.Text = digit;
-        }
-        else
-        {
-            entryResult.Text += digit;
-        }
-    }
-
     private void DivisionByZero()
     {
         entryResult.Text = DivisionByZeroText;
@@ -265,7 +251,7 @@ public partial class MainPage : ContentPage
 
     private void EnableAllButtons(bool in_enable)
     {
-        var buttons = new List<Button>
+        var buttons = new List<VisualElement>
         {
             btn1PerX, btnDivision, btnDot, btnEqual, btnPlus, btnMinus, btnMult, btnDivision
         };
@@ -292,23 +278,68 @@ public partial class MainPage : ContentPage
         switch(item)
         {
             case CHART_VIEW:
-                entryResult.IsVisible = false;
+
+                // setul chart view
+                rowInput.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplay1.Height = new GridLength(0.5, GridUnitType.Star);
+                rowDisplay2.Height = new GridLength(1, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
-                rowDisplay.Height = new GridLength(1.5, GridUnitType.Star);
-                rowInput.Height = new GridLength(1, GridUnitType.Star);
+                // reset scientific view
+                rowScientific0.Height = new GridLength(0);
+                rowScientific1.Height = new GridLength(0);
+                columnScientificLeft.Width = new GridLength(0);
+
+                entryCalculation.FontSize = 10;
+                entryResult.FontSize = 20;
                 break;
 
             case TEXT_VIEW:
-                entryResult.IsVisible = true;
+
+                // reset chart view
+                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
+                rowDisplay1.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplay2.Height = new GridLength(0, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
-                rowDisplay.Height = new GridLength(1, GridUnitType.Star);
-                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
+                // reset scientific view
+                rowScientific0.Height = new GridLength(0);
+                rowScientific1.Height = new GridLength(0);
+                columnScientificLeft.Width = new GridLength(0);
+
+                entryCalculation.FontSize = 15;
+                entryResult.FontSize = 35;
                 break;
 
             case SCIENTIFIC_VIEW:
+                // setup scientific view
+                rowScientific0.Height = new GridLength(1, GridUnitType.Star);
+                rowScientific1.Height = new GridLength(1, GridUnitType.Star);
+                columnScientificLeft.Width = new GridLength(1, GridUnitType.Star);
+
+                // reset chart view
+                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
+                rowDisplay1.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplay2.Height = new GridLength(0, GridUnitType.Star);
+                gridChart.IsVisible = false;
                 break;
+        }
+    }
+    private void AddDigit(string digit)
+    {
+        if (entryResult.Text == "0")
+        {
+            entryResult.Text = digit;
+        }
+        else if (entryResult.Text == DivisionByZeroText)
+        {
+            btnClear_Clicked(null, null);
+            // must be before the clear click event 
+            entryResult.Text = digit;
+        }
+        else
+        {
+            entryResult.Text += digit;
         }
     }
 
@@ -330,6 +361,76 @@ public partial class MainPage : ContentPage
             btn1PerX.Opacity = 1;
             btnBack.Opacity = 1;
         }
+    }
+
+    private void btnPi_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnE_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnLn_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnLog_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnExp_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnSin_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnCos_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnTg_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnCtg_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btn10LaX_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btn2LaX_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnSqrt_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnXla2_Clicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private void btnXlaY_Clicked(object sender, EventArgs e)
+    {
+
     }
 }
 
