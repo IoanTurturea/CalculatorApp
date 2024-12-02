@@ -9,6 +9,9 @@ namespace Calculator;
 
 
 // TODO: add "," between hundreds as separation
+// TODO: add round corner for image buttons
+// TODO: solve chart value insertion
+// TODO: TEST ON TARGET !
 
 public partial class MainPage : ContentPage
 {
@@ -18,12 +21,15 @@ public partial class MainPage : ContentPage
     const string SUB = "-";
     const string MUL = "*";
     const string DIV = "/";
+    const string POW = "^";
     const string DivisionByZeroText = "Error: division by 0.";
     const string CHART_VIEW = "Chart";
     const string TEXT_VIEW = "Text";
     const string SCIENTIFIC_VIEW = "Scientific";
     readonly ObservableCollection<double> LVCValues = new() { 0};
     const int WindowLength = 100;
+    bool ToggleXatY = false;
+    double RetainValueXatY = 0;
 
     public ISeries[] Series { get; set; }
 
@@ -42,15 +48,11 @@ public partial class MainPage : ContentPage
             }
         ];
 
+        // must be set here
         entryResult.Text = "0";
 
-        pickerView.ItemsSource = new List<string>() { TEXT_VIEW, CHART_VIEW, SCIENTIFIC_VIEW };
+        pickerView.ItemsSource = new List<string>() { TEXT_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
         pickerView.SelectedIndex = 0;
-
-        // hide buttons for scientific view:
-        //rowScientific0.Height = new GridLength(0);
-        //rowScientific1.Height = new GridLength(0);
-        //columnScientificLeft.Width = new GridLength(0);
 
         BindingContext = this;
     }
@@ -155,22 +157,18 @@ public partial class MainPage : ContentPage
                 case ADD:
                     result = RetainedInput + parsedText;
                     entryResult.Text = result.ToString("#,##0.##########");
-
-                    if (!entryCalculation.Text.Contains('='))
-                    {
-                        entryCalculation.Text += $" {parsedText} =";
-                    }
+                    entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case SUB:
                     result = RetainedInput - parsedText;
-                    entryResult.Text = $"{result:n}";
+                    entryResult.Text = result.ToString("#,##0.##########");
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case MUL:
                     result = RetainedInput * parsedText;
-                    entryResult.Text = $"{result:n}";
+                    entryResult.Text = result.ToString("#,##0.##########");
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
@@ -178,7 +176,7 @@ public partial class MainPage : ContentPage
                     if (parsedText != 0)
                     {
                         result = RetainedInput / parsedText;
-                        entryResult.Text = $"{result:n}";
+                        entryResult.Text = result.ToString("#,##0.##########");
                         entryCalculation.Text += $" {parsedText} =";
                     }
                     else
@@ -187,16 +185,33 @@ public partial class MainPage : ContentPage
                     }
                     break;
 
-                case "":
+                case POW:
+
+                    if(ToggleXatY)
+                    {
+                        result = Math.Pow(RetainValueXatY, parsedText);
+                        entryResult.Text = $"{result}";
+                        entryCalculation.Text += $" {parsedText} =";
+                        ToggleXatY = false;
+                    }
                     break;
             }
 
             RetainedInput = 0;
             Operation = string.Empty;
 
-            LVCValues.Add(result);
+            //// add condition that in chart view, pressing equal
+            //// simply places the input value on the chart
+            //if (pickerView.ItemsSource[pickerView.SelectedIndex] as string == CHART_VIEW)
+            //{
+            //    LVCValues.Add(parsedText);
+            //}
+            //else
+            //{
+                LVCValues.Add(result);
+            //}
 
-            if(LVCValues.Count > WindowLength)
+            if (LVCValues.Count > WindowLength)
             {
                 LVCValues.RemoveAt(0);
             }
@@ -215,6 +230,7 @@ public partial class MainPage : ContentPage
             {
                 switch (Operation)
                 {
+                    // TODO: consider changing string formatting
                     case ADD: entryResult.Text = $"{RetainedInput += temp:n}"; break;
                     case SUB: entryResult.Text = $"{RetainedInput -= temp:n}"; break;
                     case MUL: entryResult.Text = $"{RetainedInput *= temp:n}"; break;
@@ -332,10 +348,10 @@ public partial class MainPage : ContentPage
             entryResult.Text = digit;
         }
         else if (entryResult.Text == DivisionByZeroText)
-        {
+            {
             btnClear_Clicked(null, null);
             // must be before the clear click event 
-            entryResult.Text = digit;
+            entryResult.Text = string.Empty;
         }
         else
         {
@@ -363,74 +379,149 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void btnPi_Clicked(object sender, EventArgs e)
-    {
-
-    }
-
     private void btnE_Clicked(object sender, EventArgs e)
     {
-
+        entryResult.Text = Math.E.ToString();
     }
 
     private void btnLn_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"ln({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Log(result)}";
+        }
     }
 
-    private void btnLog_Clicked(object sender, EventArgs e)
+    private void btnLog2_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"lb({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Log2(result)}";
+        }
+    }
+
+    private void btnLog10_Clicked(object sender, EventArgs e)
+    {
+        entryCalculation.Text = $"log({entryResult.Text})";
+
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Log10(result)}";
+        }
     }
 
     private void btnExp_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"exp({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Exp(result)}";
+        }
+    }
+
+    private void btnPi_Clicked(object sender, EventArgs e)
+    {
+        entryResult.Text = Math.PI.ToString();
     }
 
     private void btnSin_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"sin({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Sin(result)}";
+        }
     }
 
     private void btnCos_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"cos({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Cos(result)}";
+        }
     }
 
     private void btnTg_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"cos({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Tan(result)}";
+        }
     }
 
     private void btnCtg_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"cos({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Atan(result)}";
+        }
     }
 
     private void btn10LaX_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"10^{entryResult.Text}";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Pow(10, result)}";
+        }
     }
 
     private void btn2LaX_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"2^{entryResult.Text}";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Pow(2, result)}";
+        }
     }
 
     private void btnSqrt_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"sqrt({entryResult.Text})";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Sqrt(result)}";
+        }
     }
 
     private void btnXla2_Clicked(object sender, EventArgs e)
     {
+        entryCalculation.Text = $"{entryResult.Text}^2";
 
+        if (double.TryParse(entryResult.Text, out double result))
+        {
+            entryResult.Text = $"{Math.Pow(result, 2)}";
+        }
     }
 
     private void btnXlaY_Clicked(object sender, EventArgs e)
     {
-
+        if(!ToggleXatY)
+        {
+            if (double.TryParse(entryResult.Text, out double result))
+            {
+                RetainValueXatY = result;
+                entryCalculation.Text = $"{entryResult.Text} ^";
+                ToggleXatY = true;
+                entryResult.Text = "0";
+                Operation = POW;
+            }
+        }
     }
 }
 

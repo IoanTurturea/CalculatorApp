@@ -94,47 +94,53 @@
             </Grid.ColumnDefinitions>
 
             <!--Start of scientific buttons-->
+            
+            <!--Start of top row-->
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="0"
-                         x:Name="btnPi"
-                         Clicked="btnPi_Clicked"
-                         Source="pi.png"
-                         Padding="5"
-                         Margin="1"
-                         Aspect="AspectFit"
-                         Background="Beige"/>
+                <Button Grid.Column="0"
+                        Grid.Row="0"
+                        Text="e"
+                        x:Name="btnE"
+                        Clicked="btnE_Clicked"
+                        Style="{StaticResource symbolAndLogButton}"/>
 
-            <Button Grid.Column="1"
-                    Grid.Row="0"
-                    Text="e"
-                    x:Name="btnE"
-                    Clicked="btnE_Clicked"
-                    Style="{StaticResource symbolAndLogButton}"/>
+                <Button Grid.Column="1"
+                        Grid.Row="0"
+                        Text="ln"
+                        ToolTipProperties.Text="loge"
+                        x:Name="btnLn"
+                        Clicked="btnLn_Clicked"
+                        Style="{StaticResource symbolAndLogButton}"/>
 
-            <Button Grid.Column="2"
-                    Grid.Row="0"
-                    Text="ln"
-                    x:Name="btnLn"
-                    Clicked="btnLn_Clicked"
-                    Style="{StaticResource symbolAndLogButton}"/>
+                <Button Grid.Column="2"
+                        Grid.Row="0"
+                        Text="log"
+                        ToolTipProperties.Text="log10"
+                        x:Name="btnLog10"
+                        Clicked="btnLog10_Clicked"
+                        Style="{StaticResource symbolAndLogButton}"/>
 
             <Button Grid.Column="3"
-                    Grid.Row="0"
-                    Text="log"
-                    x:Name="btnLog"
-                    Clicked="btnLog_Clicked"
-                    Style="{StaticResource symbolAndLogButton}"/>
+                        Grid.Row="0"
+                        Text="lb"
+                        ToolTipProperties.Text="log2"
+                        x:Name="btnLog2"
+                        Clicked="btnLog2_Clicked"
+                        Style="{StaticResource symbolAndLogButton}"/>
 
             <ImageButton Grid.Column="4"
-                         Grid.Row="0"
-                         x:Name="btnExp"
-                         Clicked="btnExp_Clicked"
-                         Source="e_la_x.png"
-                         Padding="5"
-                         Margin="1"
-                         Aspect="AspectFit"
-                         Background="Beige"/>
+                             Grid.Row="0"
+                             x:Name="btnExp"
+                             Clicked="btnExp_Clicked"
+                             Source="e_la_x.png"
+                             Padding="5"
+                             Margin="1"
+                             Aspect="AspectFit"
+                             Background="Beige"/>
+
+            <!--End of top row-->
+            
+            <!--Start of second row-->
 
             <Button Grid.Column="0"
                     Grid.Row="1"
@@ -159,61 +165,76 @@
                     Text="ctg"
                     x:Name="btnCtg"
                     Clicked="btnCtg_Clicked"/>
+
+            <ImageButton Grid.Column="4"
+                         Grid.Row="1"
+                         x:Name="btnPi"
+                         Clicked="btnPi_Clicked"
+                         Source="pi.png"
+                         Padding="5"
+                         Margin="1"
+                         Background="#5829CE"
+                         Aspect="AspectFit"/>
+
+            <!--End of the second row-->
             
-             <!--Place for a button-->
+            <!--Start of the column-->
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="2"
-                         x:Name="btn10LaX"
-                         Clicked="btn10LaX_Clicked"
-                         Source="zece_la_x.png"
-                         Padding="5"
-                         Margin="1"
-                         Style="{StaticResource powerButton}"/>
+                <ImageButton Grid.Column="0"
+                             Grid.Row="2"
+                             x:Name="btn10LaX"
+                             Clicked="btn10LaX_Clicked"
+                             Source="zece_la_x.png"
+                             Padding="5"
+                             Margin="1"
+                             Style="{StaticResource powerButton}"/>
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="3"
-                         x:Name="btn2LaX"
-                         Clicked="btn2LaX_Clicked"
-                         Source="doi_la_x.png"
-                         Padding="5"
-                         Margin="1"
-                         Style="{StaticResource powerButton}"/>
+                <ImageButton Grid.Column="0"
+                             Grid.Row="3"
+                             x:Name="btn2LaX"
+                             Clicked="btn2LaX_Clicked"
+                             Source="doi_la_x.png"
+                             Padding="5"
+                             Margin="1"
+                             Style="{StaticResource powerButton}"/>
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="4"
-                         x:Name="btnSqrt"
-                         Clicked="btnSqrt_Clicked"
-                         Source="sqrt.png"
-                         Padding="5"
-                         Margin="1"
-                         Style="{StaticResource powerButton}"/>
+                <ImageButton Grid.Column="0"
+                             Grid.Row="4"
+                             x:Name="btnSqrt"
+                             Clicked="btnSqrt_Clicked"
+                             Source="sqrt.png"
+                             Padding="5"
+                             Margin="1"
+                             Style="{StaticResource powerButton}"/>
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="5"
-                         x:Name="btnXla2"
-                         Clicked="btnXla2_Clicked"
-                         Source="x_la_doi.png"
-                         Padding="5"
-                         Margin="1"
-                         Style="{StaticResource powerButton}"/>
+                <ImageButton Grid.Column="0"
+                             Grid.Row="5"
+                             x:Name="btnXla2"
+                             Clicked="btnXla2_Clicked"
+                             Source="x_la_doi.png"
+                             Padding="5"
+                             Margin="1"
+                             Style="{StaticResource powerButton}"/>
 
-            <ImageButton Grid.Column="0"
-                         Grid.Row="6"
-                         x:Name="btnXlaY"
-                         Clicked="btnXlaY_Clicked"
-                         Source="x_la_y.png"
-                         Padding="5"
-                         Margin="1"
-                         Style="{StaticResource powerButton}"/>
+                <ImageButton Grid.Column="0"
+                             Grid.Row="6"
+                             x:Name="btnXlaY"
+                             Clicked="btnXlaY_Clicked"
+                             Source="x_la_y.png"
+                             Padding="5"
+                             Margin="1"
+                             Style="{StaticResource powerButton}"/>
+
+            <!--End of the column-->
 
             <!--End of scientific buttons-->
 
             <Button Grid.Column="1"
                     Grid.Row="2"
                     Style="{StaticResource standardButton}"
-                    Text="C"
                     x:Name="btnClear"
+                    FontAttributes="Bold"
+                    Text="C"
                     Clicked="btnClear_Clicked"/>
 
             <Button Grid.Column="2"
