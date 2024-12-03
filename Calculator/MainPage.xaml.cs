@@ -9,8 +9,6 @@ namespace Calculator;
 
 
 // TODO: add "," between hundreds as separation
-// TODO: add round corner for image buttons
-// TODO: solve chart value insertion
 // TODO: TEST ON TARGET !
 
 public partial class MainPage : ContentPage
@@ -26,7 +24,7 @@ public partial class MainPage : ContentPage
     const string CHART_VIEW = "Chart";
     const string TEXT_VIEW = "Text";
     const string SCIENTIFIC_VIEW = "Scientific";
-    readonly ObservableCollection<double> LVCValues = new() { 0};
+    ObservableCollection<double> LVCValues = new() { 0};
     const int WindowLength = 100;
     bool ToggleXatY = false;
     double RetainValueXatY = 0;
@@ -91,6 +89,7 @@ public partial class MainPage : ContentPage
         RetainedInput = 0;
         Operation = string.Empty;
         LVCValues.Clear();
+        LVCValues.Add(0);
     }
 
     private void btn1PerX_Clicked(object sender, EventArgs e)
@@ -156,19 +155,19 @@ public partial class MainPage : ContentPage
             {
                 case ADD:
                     result = RetainedInput + parsedText;
-                    entryResult.Text = result.ToString("#,##0.##########");
+                    entryResult.Text = ToCustomString(result);
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case SUB:
                     result = RetainedInput - parsedText;
-                    entryResult.Text = result.ToString("#,##0.##########");
+                    entryResult.Text = ToCustomString(result);
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
                 case MUL:
                     result = RetainedInput * parsedText;
-                    entryResult.Text = result.ToString("#,##0.##########");
+                    entryResult.Text = ToCustomString(result);
                     entryCalculation.Text += $" {parsedText} =";
                     break;
 
@@ -176,7 +175,7 @@ public partial class MainPage : ContentPage
                     if (parsedText != 0)
                     {
                         result = RetainedInput / parsedText;
-                        entryResult.Text = result.ToString("#,##0.##########");
+                        entryResult.Text = ToCustomString(result);
                         entryCalculation.Text += $" {parsedText} =";
                     }
                     else
@@ -190,34 +189,37 @@ public partial class MainPage : ContentPage
                     if(ToggleXatY)
                     {
                         result = Math.Pow(RetainValueXatY, parsedText);
-                        entryResult.Text = $"{result}";
+                        entryResult.Text = ToCustomString(result);
                         entryCalculation.Text += $" {parsedText} =";
                         ToggleXatY = false;
                     }
                     break;
             }
 
-            RetainedInput = 0;
-            Operation = string.Empty;
-
-            //// add condition that in chart view, pressing equal
-            //// simply places the input value on the chart
-            //if (pickerView.ItemsSource[pickerView.SelectedIndex] as string == CHART_VIEW)
-            //{
-            //    LVCValues.Add(parsedText);
-            //}
-            //else
-            //{
+            // add condition that in chart view, pressing equal
+            // simply places the input value on the chart
+            string view = pickerView.ItemsSource[pickerView.SelectedIndex] as string;
+            if ((view == CHART_VIEW) && (string.Empty == Operation))
+            {
+                LVCValues.Add(parsedText);
+                // clear the text so user understands value was used
+                entryResult.Text = "";
+            }
+            else
+            {
                 LVCValues.Add(result);
-            //}
+            }
 
             if (LVCValues.Count > WindowLength)
             {
                 LVCValues.RemoveAt(0);
             }
+
+            RetainedInput = 0;
+            Operation = string.Empty;
         }
 
-        // the else case happens if user changes operator (+, -, *, /) and presses equal
+        // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
         // which does nothing
     }
 
@@ -230,11 +232,29 @@ public partial class MainPage : ContentPage
             {
                 switch (Operation)
                 {
-                    // TODO: consider changing string formatting
-                    case ADD: entryResult.Text = $"{RetainedInput += temp:n}"; break;
-                    case SUB: entryResult.Text = $"{RetainedInput -= temp:n}"; break;
-                    case MUL: entryResult.Text = $"{RetainedInput *= temp:n}"; break;
-                    case DIV: entryResult.Text = $"{RetainedInput /= temp:n}"; break;
+                    // TODO: here you left to replace formating
+                    case ADD: 
+                        entryResult.Text = $"{RetainedInput += temp:n}"; 
+                        break;
+
+                    case SUB: 
+                        entryResult.Text = $"{RetainedInput -= temp:n}"; 
+                        break;
+
+                    case MUL: 
+                        entryResult.Text = $"{RetainedInput *= temp:n}"; 
+                        break;
+
+                    case DIV: 
+                        entryResult.Text = $"{RetainedInput /= temp:n}"; 
+                        break;
+
+                    case POW:
+                        RetainValueXatY = temp;
+                        entryCalculation.Text = $"{entryResult.Text} ^";
+                        ToggleXatY = true;
+                        entryResult.Text = "0";
+                        break;
                 }
             }
             else
@@ -513,15 +533,13 @@ public partial class MainPage : ContentPage
     {
         if(!ToggleXatY)
         {
-            if (double.TryParse(entryResult.Text, out double result))
-            {
-                RetainValueXatY = result;
-                entryCalculation.Text = $"{entryResult.Text} ^";
-                ToggleXatY = true;
-                entryResult.Text = "0";
-                Operation = POW;
-            }
+            BuildOperation(POW);
         }
+    }
+
+    private string ToCustomString(double input)
+    {
+        return input.ToString("#,##0.##########");
     }
 }
 

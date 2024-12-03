@@ -20,6 +20,7 @@
         <Style TargetType="ImageButton" x:Key="powerButton">
             <Setter Property="Background" Value="OrangeRed"/>
             <Setter Property="Aspect" Value="AspectFit"/>
+            <Setter Property="CornerRadius" Value="5"/>
         </Style>
     </ContentPage.Resources>
     
@@ -173,6 +174,7 @@
                          Source="pi.png"
                          Padding="5"
                          Margin="1"
+                         CornerRadius="5"
                          Background="#5829CE"
                          Aspect="AspectFit"/>
 
@@ -250,6 +252,7 @@
                          Clicked="btnBack_Clicked"
                          Source="back.png"
                          Padding="5"
+                         CornerRadius="5"
                          Background="WhiteSmoke"
                          Margin="1"/>
 
