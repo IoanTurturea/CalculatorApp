@@ -4,16 +4,21 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using System.Collections.ObjectModel;
-
 namespace Calculator;
 
 
 // TODO: add "," between hundreds as separation
 // TODO: TEST ON TARGET !
+// TODO: other feature - better implement them after first release:
+// another chart view
+// both chart and scientific
+// programmer mode would take too much time to build, better keep it simple
+// replace combobox with TabView
+// TODO: optional rename input arguments with "in" before
 
 public partial class MainPage : ContentPage
 {
-    double RetainedInput = 0;
+    double RetainFirstOperand = 0;
     string Operation = string.Empty;
     const string ADD = "+";
     const string SUB = "-";
@@ -24,10 +29,9 @@ public partial class MainPage : ContentPage
     const string CHART_VIEW = "Chart";
     const string TEXT_VIEW = "Text";
     const string SCIENTIFIC_VIEW = "Scientific";
-    ObservableCollection<double> LVCValues = new() { 0};
+    ObservableCollection<double> LVCValues = new() { 0 };
     const int WindowLength = 100;
     bool ToggleXatY = false;
-    double RetainValueXatY = 0;
 
     public ISeries[] Series { get; set; }
 
@@ -83,10 +87,10 @@ public partial class MainPage : ContentPage
         {
             EnableAllButtons(true);
         }
-        
+
         entryCalculation.Text = string.Empty;
         entryResult.Text = "0";
-        RetainedInput = 0;
+        RetainFirstOperand = 0;
         Operation = string.Empty;
         LVCValues.Clear();
         LVCValues.Add(0);
@@ -147,76 +151,13 @@ public partial class MainPage : ContentPage
 
     private void btnEqual_Clicked(object sender, EventArgs e)
     {
-        if (double.TryParse(entryResult.Text, out double parsedText))
+        if (double.TryParse(entryResult.Text, out double result))
         {
-            double result = 0;
+            DuplicatedForEqualAndOperation(result, false);
 
-            switch (Operation)
-            {
-                case ADD:
-                    result = RetainedInput + parsedText;
-                    entryResult.Text = ToCustomString(result);
-                    entryCalculation.Text += $" {parsedText} =";
-                    break;
-
-                case SUB:
-                    result = RetainedInput - parsedText;
-                    entryResult.Text = ToCustomString(result);
-                    entryCalculation.Text += $" {parsedText} =";
-                    break;
-
-                case MUL:
-                    result = RetainedInput * parsedText;
-                    entryResult.Text = ToCustomString(result);
-                    entryCalculation.Text += $" {parsedText} =";
-                    break;
-
-                case DIV:
-                    if (parsedText != 0)
-                    {
-                        result = RetainedInput / parsedText;
-                        entryResult.Text = ToCustomString(result);
-                        entryCalculation.Text += $" {parsedText} =";
-                    }
-                    else
-                    {
-                        DivisionByZero();
-                    }
-                    break;
-
-                case POW:
-
-                    if(ToggleXatY)
-                    {
-                        result = Math.Pow(RetainValueXatY, parsedText);
-                        entryResult.Text = ToCustomString(result);
-                        entryCalculation.Text += $" {parsedText} =";
-                        ToggleXatY = false;
-                    }
-                    break;
-            }
-
-            // add condition that in chart view, pressing equal
-            // simply places the input value on the chart
-            string view = pickerView.ItemsSource[pickerView.SelectedIndex] as string;
-            if ((view == CHART_VIEW) && (string.Empty == Operation))
-            {
-                LVCValues.Add(parsedText);
-                // clear the text so user understands value was used
-                entryResult.Text = "";
-            }
-            else
-            {
-                LVCValues.Add(result);
-            }
-
-            if (LVCValues.Count > WindowLength)
-            {
-                LVCValues.RemoveAt(0);
-            }
-
-            RetainedInput = 0;
+            RetainFirstOperand = 0;
             Operation = string.Empty;
+            entryCalculation.Text += $" {result} =";
         }
 
         // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
@@ -227,39 +168,15 @@ public partial class MainPage : ContentPage
     {
         if (double.TryParse(entryResult.Text, out double temp))
         {
-            // this means equal was not pressed and another input is added
+            // this means equal button was not pressed
+            // and another input is added. Must compute the old and the coming function
             if (Operation != string.Empty)
             {
-                switch (Operation)
-                {
-                    // TODO: here you left to replace formating
-                    case ADD: 
-                        entryResult.Text = $"{RetainedInput += temp:n}"; 
-                        break;
-
-                    case SUB: 
-                        entryResult.Text = $"{RetainedInput -= temp:n}"; 
-                        break;
-
-                    case MUL: 
-                        entryResult.Text = $"{RetainedInput *= temp:n}"; 
-                        break;
-
-                    case DIV: 
-                        entryResult.Text = $"{RetainedInput /= temp:n}"; 
-                        break;
-
-                    case POW:
-                        RetainValueXatY = temp;
-                        entryCalculation.Text = $"{entryResult.Text} ^";
-                        ToggleXatY = true;
-                        entryResult.Text = "0";
-                        break;
-                }
+                DuplicatedForEqualAndOperation(temp, true);
             }
             else
             {
-                RetainedInput = temp;
+                RetainFirstOperand = temp;
             }
 
             entryCalculation.Text = $"{entryResult.Text} {in_operator}";
@@ -278,6 +195,75 @@ public partial class MainPage : ContentPage
         Operation = in_operator;
     }
 
+    private void DuplicatedForEqualAndOperation(double in_parsedText, bool in_continueWithoutEqual)
+    {
+        double result = 0;
+
+        switch (Operation)
+        {
+            case ADD:
+                result = RetainFirstOperand + in_parsedText;
+                entryResult.Text = ToCustomString(result);
+                break;
+
+            case SUB:
+                result = RetainFirstOperand - in_parsedText;
+                entryResult.Text = ToCustomString(result);
+                break;
+
+            case MUL:
+                result = RetainFirstOperand * in_parsedText;
+                entryResult.Text = ToCustomString(result);
+                break;
+
+            case DIV:
+                if (in_parsedText != 0)
+                {
+                    result = RetainFirstOperand / in_parsedText;
+                    entryResult.Text = ToCustomString(result);
+                }
+                else
+                {
+                    DivisionByZero();
+                }
+                break;
+
+            case POW:
+
+                if (ToggleXatY)
+                {
+                    result = Math.Pow(RetainFirstOperand, in_parsedText);
+                    entryResult.Text = ToCustomString(result);
+                    ToggleXatY = false;
+                }
+                break;
+        }
+
+        if (in_continueWithoutEqual)
+        {
+            RetainFirstOperand = result;
+        }
+
+        // add condition that in chart view, pressing equal
+        // simply places the input value on the chart
+        string view = pickerView.ItemsSource[pickerView.SelectedIndex] as string;
+        if ((view == CHART_VIEW) && (string.Empty == Operation))
+        {
+            LVCValues.Add(in_parsedText);
+            // clear the text so user understands value was used
+            entryResult.Text = string.Empty;
+        }
+        else
+        {
+            LVCValues.Add(result);
+        }
+
+        if (LVCValues.Count > WindowLength)
+        {
+            LVCValues.RemoveAt(0);
+        }
+    }
+
     private void DivisionByZero()
     {
         entryResult.Text = DivisionByZeroText;
@@ -292,18 +278,12 @@ public partial class MainPage : ContentPage
             btn1PerX, btnDivision, btnDot, btnEqual, btnPlus, btnMinus, btnMult, btnDivision
         };
 
-        foreach(var button in buttons)
+        foreach (var button in buttons)
         {
             button.IsEnabled = in_enable;
 
-            if(in_enable)
-            {
-                button.Opacity = 1;
-            }
-            else
-            {
-                button.Opacity = 0.5;
-            }
+            if (in_enable) button.Opacity = 1;
+            else           button.Opacity = 0.5;
         }
     }
 
@@ -311,7 +291,7 @@ public partial class MainPage : ContentPage
     {
         var item = pickerView.ItemsSource[pickerView.SelectedIndex];
 
-        switch(item)
+        switch (item)
         {
             case CHART_VIEW:
 
@@ -361,21 +341,26 @@ public partial class MainPage : ContentPage
                 break;
         }
     }
-    private void AddDigit(string digit)
+
+    private void AddDigit(string in_digit)
     {
         if (entryResult.Text == "0")
         {
-            entryResult.Text = digit;
+            entryResult.Text = in_digit;
         }
         else if (entryResult.Text == DivisionByZeroText)
-            {
+        {
             btnClear_Clicked(null, null);
             // must be before the clear click event 
             entryResult.Text = string.Empty;
         }
         else
         {
-            entryResult.Text += digit;
+            // TODO: here you left to solve problem on using intermediate double conversion which losses decimals
+            string concat = entryResult.Text + in_digit;
+            //double format = double.Parse(concat);
+            //entryResult.Text = ToCustomString(format);
+            entryResult.Text = concat;
         }
     }
 
@@ -383,7 +368,7 @@ public partial class MainPage : ContentPage
     {
         var entry = sender as Entry;
 
-        if(entry?.Text == "0")
+        if (entry?.Text == "0")
         {
             btn1PerX.IsEnabled = false;
             btnBack.IsEnabled = false;
@@ -531,9 +516,10 @@ public partial class MainPage : ContentPage
 
     private void btnXlaY_Clicked(object sender, EventArgs e)
     {
-        if(!ToggleXatY)
+        if (!ToggleXatY)
         {
             BuildOperation(POW);
+            ToggleXatY = true;
         }
     }
 
