@@ -71,7 +71,7 @@
               x:Name="gridChart"
               IsVisible="False">
             <lvc:CartesianChart Series="{Binding Series}"
-                                ZoomMode="ZoomX"/>
+                                ZoomMode="Both"/>
         </Grid>
 
         <Grid Grid.Row="3"

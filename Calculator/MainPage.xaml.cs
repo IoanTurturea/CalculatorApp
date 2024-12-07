@@ -1,5 +1,6 @@
 ﻿
 using LiveChartsCore;
+using LiveChartsCore.Drawing;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
@@ -15,6 +16,9 @@ namespace Calculator;
 // programmer mode would take too much time to build, better keep it simple
 // replace combobox with TabView
 // TODO: optional rename input arguments with "in" before
+// TODO: hide line of the entryCalculation when in Chart
+// TODO: add modulo button in standard calculator
+// TODO: add behavior that multiple equal presses will repeat the previous operation
 
 public partial class MainPage : ContentPage
 {
@@ -31,6 +35,7 @@ public partial class MainPage : ContentPage
     const string SCIENTIFIC_VIEW = "Scientific";
     ObservableCollection<double> LVCValues = new() { 0 };
     const int WindowLength = 100;
+    // TODO: can we remove this variable ?
     bool ToggleXatY = false;
 
     public ISeries[] Series { get; set; }
@@ -39,24 +44,27 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
 
-        Series = [
-            new LineSeries<double>
-            {
-                Values = LVCValues,
-                GeometryFill = null,
-                GeometryStroke = null,
-                LineSmoothness = 0,
-                Stroke = new SolidColorPaint(SKColors.Blue, 1)
-            }
-        ];
+        InitializeChart();
 
-        // must be set here
+        // must be set here not in UI
         entryResult.Text = "0";
 
         pickerView.ItemsSource = new List<string>() { TEXT_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
         pickerView.SelectedIndex = 0;
 
         BindingContext = this;
+    }
+
+    private void InitializeChart()
+    {
+        Series = [
+            new LineSeries<double>
+            {
+                Values = LVCValues,
+                LineSmoothness = 0,
+                Stroke = new SolidColorPaint(SKColors.Blue, 1)
+            }
+        ];
     }
 
     private void btnBack_Clicked(object sender, EventArgs e)
@@ -92,6 +100,8 @@ public partial class MainPage : ContentPage
         entryResult.Text = "0";
         RetainFirstOperand = 0;
         Operation = string.Empty;
+
+        InitializeChart();
         LVCValues.Clear();
         LVCValues.Add(0);
     }
@@ -104,7 +114,7 @@ public partial class MainPage : ContentPage
         {
             if (temp != 0)
             {
-                entryResult.Text = $"{1 / temp:n}";
+                entryResult.Text = $"{ToCustomString(1 / temp)}";
             }
             else
             {
@@ -133,13 +143,13 @@ public partial class MainPage : ContentPage
 
     private void btn0_Clicked(object sender, EventArgs e) => AddDigit("0");
 
-    private void btnPlus_Clicked(object sender, EventArgs e) => BuildOperation(ADD);
+    private void btnPlus_Clicked(object sender, EventArgs e)     => BuildOperation(ADD);
 
     private void btnDivision_Clicked(object sender, EventArgs e) => BuildOperation(DIV);
 
-    private void btnMult_Clicked(object sender, EventArgs e) => BuildOperation(MUL);
+    private void btnMult_Clicked(object sender, EventArgs e)     => BuildOperation(MUL);
 
-    private void btnMinus_Clicked(object sender, EventArgs e) => BuildOperation(SUB);
+    private void btnMinus_Clicked(object sender, EventArgs e)    => BuildOperation(SUB);
 
     private void btnDot_Clicked(object sender, EventArgs e)
     {
@@ -153,11 +163,19 @@ public partial class MainPage : ContentPage
     {
         if (double.TryParse(entryResult.Text, out double result))
         {
-            DuplicatedForEqualAndOperation(result, false);
+            DuplicateCodeAboutOperations(result, false);
+
+            if (string.Empty == Operation)
+            {
+                entryCalculation.Text = $" {result} =";
+            }
+            else
+            {
+                entryCalculation.Text += $" {result} =";
+            }
 
             RetainFirstOperand = 0;
             Operation = string.Empty;
-            entryCalculation.Text += $" {result} =";
         }
 
         // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
@@ -172,7 +190,7 @@ public partial class MainPage : ContentPage
             // and another input is added. Must compute the old and the coming function
             if (Operation != string.Empty)
             {
-                DuplicatedForEqualAndOperation(temp, true);
+                DuplicateCodeAboutOperations(temp, true);
             }
             else
             {
@@ -195,7 +213,7 @@ public partial class MainPage : ContentPage
         Operation = in_operator;
     }
 
-    private void DuplicatedForEqualAndOperation(double in_parsedText, bool in_continueWithoutEqual)
+    private void DuplicateCodeAboutOperations(double in_parsedText, bool in_continueWithoutEqual)
     {
         double result = 0;
 
@@ -237,21 +255,21 @@ public partial class MainPage : ContentPage
                     ToggleXatY = false;
                 }
                 break;
+
+            case "":
+                entryResult.Text = $"{in_parsedText}";
+                break;
         }
 
+        // meaning that another operator was pressed instead of equal
         if (in_continueWithoutEqual)
         {
             RetainFirstOperand = result;
         }
 
-        // add condition that in chart view, pressing equal
-        // simply places the input value on the chart
-        string view = pickerView.ItemsSource[pickerView.SelectedIndex] as string;
-        if ((view == CHART_VIEW) && (string.Empty == Operation))
+        if (string.Empty == Operation)
         {
             LVCValues.Add(in_parsedText);
-            // clear the text so user understands value was used
-            entryResult.Text = string.Empty;
         }
         else
         {
@@ -356,11 +374,26 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            // TODO: here you left to solve problem on using intermediate double conversion which losses decimals
             string concat = entryResult.Text + in_digit;
-            //double format = double.Parse(concat);
-            //entryResult.Text = ToCustomString(format);
-            entryResult.Text = concat;
+            int index = concat.IndexOf('.');
+            string newConcat = string.Empty;
+            if(index != -1)
+            {
+                newConcat = concat.Remove(index);
+            }
+
+            if (newConcat.Length > 3)
+            {
+                entryResult.Text = concat;
+            }
+            else if(!concat.Contains('.') && (concat.Length > 3))
+            {
+                entryResult.Text = $"{decimal.Parse(concat):N0}";
+            }
+            else
+            {
+                entryResult.Text = concat;
+            }
         }
     }
 
