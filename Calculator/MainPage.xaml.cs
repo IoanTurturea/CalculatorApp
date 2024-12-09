@@ -5,10 +5,10 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Tracing;
 namespace Calculator;
 
 
-// TODO: add "," between hundreds as separation
 // TODO: TEST ON TARGET !
 // TODO: other feature - better implement them after first release:
 // another chart view
@@ -23,6 +23,7 @@ namespace Calculator;
 public partial class MainPage : ContentPage
 {
     double RetainFirstOperand = 0;
+    double RetainSecondOperand = 0;
     string Operation = string.Empty;
     const string ADD = "+";
     const string SUB = "-";
@@ -37,6 +38,12 @@ public partial class MainPage : ContentPage
     const int WindowLength = 100;
     // TODO: can we remove this variable ?
     bool ToggleXatY = false;
+
+    /// <summary>
+    /// Flag to indicate equal was pressed. Different than checking the entry calculation contains =
+    /// because this flag resets after each usage
+    /// </summary>
+    bool OneShot = false;
 
     public ISeries[] Series { get; set; }
 
@@ -99,7 +106,9 @@ public partial class MainPage : ContentPage
         entryCalculation.Text = string.Empty;
         entryResult.Text = "0";
         RetainFirstOperand = 0;
+        RetainSecondOperand = 0;
         Operation = string.Empty;
+        OneShot = true;
 
         InitializeChart();
         LVCValues.Clear();
@@ -163,41 +172,55 @@ public partial class MainPage : ContentPage
     {
         if (double.TryParse(entryResult.Text, out double result))
         {
-            DuplicateCodeAboutOperations(result, false);
-
             if (string.Empty == Operation)
             {
+                // means only simple equal press on a number, nothing to compute
+                RetainSecondOperand = result;
+
                 entryCalculation.Text = $" {result} =";
             }
             else
             {
-                entryCalculation.Text += $" {result} =";
+                if(entryCalculation.Text.Contains("="))
+                {
+                    RetainFirstOperand = result;
+                }
+                else
+                {
+                    RetainSecondOperand = result;
+                }
+
+                entryCalculation.Text = $"{RetainFirstOperand} {Operation} {RetainSecondOperand} =";
             }
 
-            RetainFirstOperand = 0;
-            Operation = string.Empty;
+            DuplicateCodeAboutOperations();
         }
 
         // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
         // which does nothing
+
+        OneShot = false;
     }
 
     private void BuildOperation(string in_operator)
     {
-        if (double.TryParse(entryResult.Text, out double temp))
+        if (double.TryParse(entryResult.Text, out double result))
         {
             // this means equal button was not pressed
             // and another input is added. Must compute the old and the coming function
             if (Operation != string.Empty)
             {
-                DuplicateCodeAboutOperations(temp, true);
-            }
-            else
-            {
-                RetainFirstOperand = temp;
+                if(!entryCalculation.Text.Contains("="))
+                {
+                    RetainSecondOperand = result;
+                }
+
+                result = DuplicateCodeAboutOperations();
             }
 
-            entryCalculation.Text = $"{entryResult.Text} {in_operator}";
+            RetainFirstOperand = result;
+
+            entryCalculation.Text = $"{result} {in_operator}";
             entryResult.Text = string.Empty;
         }
         else
@@ -213,32 +236,28 @@ public partial class MainPage : ContentPage
         Operation = in_operator;
     }
 
-    private void DuplicateCodeAboutOperations(double in_parsedText, bool in_continueWithoutEqual)
+    private double DuplicateCodeAboutOperations()
     {
         double result = 0;
 
         switch (Operation)
         {
             case ADD:
-                result = RetainFirstOperand + in_parsedText;
-                entryResult.Text = ToCustomString(result);
+                result = RetainFirstOperand + RetainSecondOperand;
                 break;
 
             case SUB:
-                result = RetainFirstOperand - in_parsedText;
-                entryResult.Text = ToCustomString(result);
+                result = RetainFirstOperand - RetainSecondOperand;
                 break;
 
             case MUL:
-                result = RetainFirstOperand * in_parsedText;
-                entryResult.Text = ToCustomString(result);
+                result = RetainFirstOperand * RetainSecondOperand;
                 break;
 
             case DIV:
-                if (in_parsedText != 0)
+                if (RetainSecondOperand != 0)
                 {
-                    result = RetainFirstOperand / in_parsedText;
-                    entryResult.Text = ToCustomString(result);
+                    result = RetainFirstOperand / RetainSecondOperand;
                 }
                 else
                 {
@@ -250,26 +269,24 @@ public partial class MainPage : ContentPage
 
                 if (ToggleXatY)
                 {
-                    result = Math.Pow(RetainFirstOperand, in_parsedText);
-                    entryResult.Text = ToCustomString(result);
+                    result = Math.Pow(RetainFirstOperand, RetainSecondOperand);
                     ToggleXatY = false;
                 }
                 break;
 
             case "":
-                entryResult.Text = $"{in_parsedText}";
+                result = RetainSecondOperand;
                 break;
         }
 
-        // meaning that another operator was pressed instead of equal
-        if (in_continueWithoutEqual)
+        if (Operation != DIV || RetainSecondOperand != 0)
         {
-            RetainFirstOperand = result;
+            entryResult.Text = ToCustomString(result);
         }
 
         if (string.Empty == Operation)
         {
-            LVCValues.Add(in_parsedText);
+            LVCValues.Add(RetainSecondOperand);
         }
         else
         {
@@ -280,6 +297,8 @@ public partial class MainPage : ContentPage
         {
             LVCValues.RemoveAt(0);
         }
+
+        return result;
     }
 
     private void DivisionByZero()
@@ -369,30 +388,38 @@ public partial class MainPage : ContentPage
         else if (entryResult.Text == DivisionByZeroText)
         {
             btnClear_Clicked(null, null);
-            // must be before the clear click event 
+            // must be after the clear click event 
             entryResult.Text = string.Empty;
         }
         else
         {
-            string concat = entryResult.Text + in_digit;
-            int index = concat.IndexOf('.');
-            string newConcat = string.Empty;
-            if(index != -1)
+            if (!OneShot)
             {
-                newConcat = concat.Remove(index);
-            }
-
-            if (newConcat.Length > 3)
-            {
-                entryResult.Text = concat;
-            }
-            else if(!concat.Contains('.') && (concat.Length > 3))
-            {
-                entryResult.Text = $"{decimal.Parse(concat):N0}";
+                entryResult.Text = in_digit;
+                OneShot = true;
             }
             else
             {
-                entryResult.Text = concat;
+                string concat = entryResult.Text + in_digit;
+                int index = concat.IndexOf('.');
+                string newConcat = string.Empty;
+                if (index != -1)
+                {
+                    newConcat = concat.Remove(index);
+                }
+
+                if (newConcat.Length > 3)
+                {
+                    entryResult.Text = concat;
+                }
+                else if (!concat.Contains('.') && (concat.Length > 3))
+                {
+                    entryResult.Text = $"{decimal.Parse(concat):N0}";
+                }
+                else
+                {
+                    entryResult.Text = concat;
+                }
             }
         }
     }
