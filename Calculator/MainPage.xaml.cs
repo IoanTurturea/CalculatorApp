@@ -16,10 +16,6 @@ namespace Calculator;
 // programmer mode would take too much time to build, better keep it simple
 // replace combobox with TabView
 // TODO: optional rename input arguments with "in" before
-// TODO: hide line of the entryCalculation when in Chart
-// TODO: add modulo button in standard calculator
-// TODO: add behavior that multiple equal presses will repeat the previous operation
-
 public partial class MainPage : ContentPage
 {
     double RetainFirstOperand = 0;
@@ -30,14 +26,13 @@ public partial class MainPage : ContentPage
     const string MUL = "*";
     const string DIV = "/";
     const string POW = "^";
+    const string MOD = "modulo";
     const string DivisionByZeroText = "Error: division by 0.";
     const string CHART_VIEW = "Chart";
     const string TEXT_VIEW = "Text";
     const string SCIENTIFIC_VIEW = "Scientific";
     ObservableCollection<double> LVCValues = new() { 0 };
     const int WindowLength = 100;
-    // TODO: can we remove this variable ?
-    bool ToggleXatY = false;
 
     /// <summary>
     /// Flag to indicate equal was pressed. Different than checking the entry calculation contains =
@@ -267,11 +262,12 @@ public partial class MainPage : ContentPage
 
             case POW:
 
-                if (ToggleXatY)
-                {
-                    result = Math.Pow(RetainFirstOperand, RetainSecondOperand);
-                    ToggleXatY = false;
-                }
+                result = Math.Pow(RetainFirstOperand, RetainSecondOperand);
+                break;
+
+            case MOD:
+
+                result = RetainFirstOperand % RetainSecondOperand;
                 break;
 
             case "":
@@ -343,8 +339,7 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                entryCalculation.FontSize = 10;
-                entryResult.FontSize = 20;
+                ArrangeEntrys(10, 20, 60, LayoutOptions.End);
                 break;
 
             case TEXT_VIEW:
@@ -362,6 +357,7 @@ public partial class MainPage : ContentPage
 
                 entryCalculation.FontSize = 15;
                 entryResult.FontSize = 35;
+                ArrangeEntrys(15, 35, -1, LayoutOptions.Fill);
                 break;
 
             case SCIENTIFIC_VIEW:
@@ -375,12 +371,31 @@ public partial class MainPage : ContentPage
                 rowDisplay1.Height = new GridLength(1, GridUnitType.Star);
                 rowDisplay2.Height = new GridLength(0, GridUnitType.Star);
                 gridChart.IsVisible = false;
+
+                ArrangeEntrys(15, 35, -1, LayoutOptions.Fill);
                 break;
         }
     }
 
+    private void ArrangeEntrys(double fontSizeCalculation, 
+                               double fontSizeResult, 
+                               double widthRequest, 
+                               LayoutOptions layoutOptions)
+    {
+        // modify the entries
+        entryCalculation.FontSize = fontSizeCalculation;
+        entryCalculation.WidthRequest = widthRequest;
+        entryCalculation.HorizontalOptions = layoutOptions;
+
+        entryResult.FontSize = fontSizeResult;
+        entryResult.WidthRequest = widthRequest;
+        entryResult.HorizontalOptions = layoutOptions;
+    }
+
     private void AddDigit(string in_digit)
     {
+        const int thousandDigits = 3;
+
         if (entryResult.Text == "0")
         {
             entryResult.Text = in_digit;
@@ -408,11 +423,11 @@ public partial class MainPage : ContentPage
                     newConcat = concat.Remove(index);
                 }
 
-                if (newConcat.Length > 3)
+                if (newConcat.Length > thousandDigits)
                 {
                     entryResult.Text = concat;
                 }
-                else if (!concat.Contains('.') && (concat.Length > 3))
+                else if (!concat.Contains('.') && (concat.Length > thousandDigits))
                 {
                     entryResult.Text = $"{decimal.Parse(concat):N0}";
                 }
@@ -455,7 +470,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Log(result)}";
+            entryResult.Text = ToCustomString(Math.Log(result));
         }
     }
 
@@ -465,7 +480,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Log2(result)}";
+            entryResult.Text = ToCustomString(Math.Log2(result));
         }
     }
 
@@ -475,7 +490,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Log10(result)}";
+            entryResult.Text = ToCustomString(Math.Log10(result));
         }
     }
 
@@ -485,7 +500,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Exp(result)}";
+            entryResult.Text = ToCustomString(Math.Exp(result));
         }
     }
 
@@ -500,7 +515,8 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Sin(result)}";
+            entryResult.Text = ToCustomString(Math.Sin(result))
+                ;
         }
     }
 
@@ -510,7 +526,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Cos(result)}";
+            entryResult.Text = ToCustomString(Math.Cos(result));
         }
     }
 
@@ -520,7 +536,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Tan(result)}";
+            entryResult.Text = ToCustomString(Math.Tan(result));
         }
     }
 
@@ -530,7 +546,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Atan(result)}";
+            entryResult.Text = ToCustomString(Math.Atan(result));
         }
     }
 
@@ -540,7 +556,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Pow(10, result)}";
+            entryResult.Text = ToCustomString(Math.Pow(10, result));
         }
     }
 
@@ -550,7 +566,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Pow(2, result)}";
+            entryResult.Text = ToCustomString(Math.Pow(2, result));
         }
     }
 
@@ -560,7 +576,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Sqrt(result)}";
+            entryResult.Text = ToCustomString(Math.Sqrt(result));
         }
     }
 
@@ -570,22 +586,23 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = $"{Math.Pow(result, 2)}";
+            entryResult.Text = ToCustomString(Math.Pow(result, 2));
         }
     }
 
     private void btnXlaY_Clicked(object sender, EventArgs e)
     {
-        if (!ToggleXatY)
-        {
-            BuildOperation(POW);
-            ToggleXatY = true;
-        }
+        BuildOperation(POW);
     }
 
     private string ToCustomString(double input)
     {
         return input.ToString("#,##0.##########");
+    }
+
+    private void btnModulo_Clicked(object sender, EventArgs e)
+    {
+        BuildOperation(MOD);
     }
 }
 

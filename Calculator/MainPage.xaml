@@ -236,17 +236,18 @@
                     Style="{StaticResource standardButton}"
                     x:Name="btnClear"
                     FontAttributes="Bold"
+                    Background="LightBlue"
                     Text="C"
                     Clicked="btnClear_Clicked"/>
 
-            <Button Grid.Column="2"
-                    Grid.Row="2"
+            <Button Grid.Column="3"
+                    Grid.Row="6"
                     Style="{StaticResource standardButton}"
                     Text="1/x"
                     x:Name="btn1PerX"
                     Clicked="btn1PerX_Clicked"/>
 
-            <ImageButton Grid.Column="3"
+            <ImageButton Grid.Column="2"
                          Grid.Row="2"
                          x:Name="btnBack"
                          Clicked="btnBack_Clicked"
@@ -255,6 +256,14 @@
                          CornerRadius="5"
                          Background="WhiteSmoke"
                          Margin="1"/>
+
+            <Button Grid.Column="3"
+                    Grid.Row="2"
+                    Style="{StaticResource standardButton}"
+                    Text="mod"
+                    ToolTipProperties.Text="modulo"
+                    x:Name="btnModulo"
+                    Clicked="btnModulo_Clicked"/>
 
             <Button Grid.Column="4"
                     Grid.Row="2"
@@ -363,9 +372,8 @@
                     x:Name="btn0"
                     Clicked="btn0_Clicked"/>
 
-            <Button Grid.Column="3"
+            <Button Grid.Column="4"
                     Grid.Row="6"
-                    Grid.ColumnSpan="2"
                     Style="{StaticResource standardButton}"
                     Text="="
                     x:Name="btnEqual"
