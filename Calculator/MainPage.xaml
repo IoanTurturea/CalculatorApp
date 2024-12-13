@@ -9,12 +9,13 @@
         <Style TargetType="Button" x:Key="standardButton">
             <Setter Property="Background" Value="WhiteSmoke"/>
             <Setter Property="TextColor" Value="Black"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="30"/>
         </Style>
         
         <Style TargetType="Button" x:Key="symbolAndLogButton">
             <Setter Property="Background" Value="Beige"/>
             <Setter Property="TextColor" Value="Black"/>
+            <Setter Property="FontSize" Value="20"/>
         </Style>
 
         <Style TargetType="ImageButton" x:Key="powerButton">
@@ -27,9 +28,13 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.25*"/>
-            <RowDefinition x:Name="rowDisplay1"/>
-            <RowDefinition x:Name="rowDisplay2" Height="0"/>
+            <!--Picker to change view mode-->
+            <RowDefinition Height="0.2*"/>
+            <!--Detailed calculation (history) and Input and result text-->
+            <RowDefinition x:Name="rowDisplayText" Height="1*"/>
+            <!--Chart - is collaped by default-->
+            <RowDefinition x:Name="rowDisplayChart" Height="0"/>
+            <!--Keyword-->
             <RowDefinition x:Name="rowInput" Height="2*"/>
         </Grid.RowDefinitions>
 
@@ -37,11 +42,14 @@
             <StackLayout Orientation="Horizontal">
                 <Label Text="Select view:"
                        VerticalOptions="Center"
+                       FontSize="20"
                        Margin="5,0,0,0"/>
 
                 <Picker x:Name="pickerView"
                         SelectedIndexChanged="pickerView_SelectedIndexChanged"
-                        WidthRequest="110"
+                        WidthRequest="100"
+                        HeightRequest="50"
+                        FontSize="20"
                         Margin="2,0,0,0"/>
             </StackLayout>
         </Grid>
@@ -56,18 +64,19 @@
 
             <Entry x:Name="entryCalculation"
                    Grid.Row="0"
-                   FontSize="15"
-                   HorizontalTextAlignment="End"/>
+                   FontSize="{Binding FontSizeEntryCalculation}"
+                   HorizontalTextAlignment="End"
+                   IsReadOnly="True"/>
 
             <Entry x:Name="entryResult"
                    Grid.Row="1"
-                   FontSize="35"
+                   FontSize="{Binding FontSizeEntryResult}"
                    HorizontalTextAlignment="End"
-                   TextChanged="entryResult_TextChanged"/>
+                   TextChanged="entryResult_TextChanged"
+                   IsReadOnly="True"/>
         </Grid>
 
-        <Grid Grid.Row="1"
-              Grid.RowSpan="2"
+        <Grid Grid.Row="2"
               x:Name="gridChart"
               IsVisible="False">
             <lvc:CartesianChart Series="{Binding Series}"
@@ -130,14 +139,14 @@
                         Style="{StaticResource symbolAndLogButton}"/>
 
             <ImageButton Grid.Column="4"
-                             Grid.Row="0"
-                             x:Name="btnExp"
-                             Clicked="btnExp_Clicked"
-                             Source="e_la_x.png"
-                             Padding="5"
-                             Margin="1"
-                             Aspect="AspectFit"
-                             Background="Beige"/>
+                         Grid.Row="0"
+                         x:Name="btnExp"
+                         Clicked="btnExp_Clicked"
+                         Source="e_la_x.png"
+                         Padding="5"
+                         Margin="1"
+                         Aspect="AspectFit"
+                         Background="Beige"/>
 
             <!--End of top row-->
             
@@ -147,32 +156,36 @@
                     Grid.Row="1"
                     Text="sin"
                     x:Name="btnSin"
-                    Clicked="btnSin_Clicked"/>
+                    Clicked="btnSin_Clicked"
+                    FontSize="20"/>
 
             <Button Grid.Column="1"
                     Grid.Row="1"
                     Text="cos"
                     x:Name="btnCos"
-                    Clicked="btnCos_Clicked"/>
+                    Clicked="btnCos_Clicked"
+                    FontSize="20"/>
 
             <Button Grid.Column="2"
                     Grid.Row="1"
                     Text="tg"
                     x:Name="btnTg"
-                    Clicked="btnTg_Clicked"/>
+                    Clicked="btnTg_Clicked"
+                    FontSize="20"/>
 
             <Button Grid.Column="3"
                     Grid.Row="1"
                     Text="ctg"
                     x:Name="btnCtg"
-                    Clicked="btnCtg_Clicked"/>
+                    Clicked="btnCtg_Clicked"
+                    FontSize="20"/>
 
             <ImageButton Grid.Column="4"
                          Grid.Row="1"
                          x:Name="btnPi"
                          Clicked="btnPi_Clicked"
                          Source="pi.png"
-                         Padding="5"
+                         Padding="15"
                          Margin="1"
                          CornerRadius="5"
                          Background="#5829CE"
@@ -238,6 +251,7 @@
                     FontAttributes="Bold"
                     Background="LightBlue"
                     Text="C"
+                    FontSize="40"
                     Clicked="btnClear_Clicked"/>
 
             <Button Grid.Column="3"
@@ -252,16 +266,16 @@
                          x:Name="btnBack"
                          Clicked="btnBack_Clicked"
                          Source="back.png"
-                         Padding="5"
+                         Padding="20"
                          CornerRadius="5"
-                         Background="WhiteSmoke"
-                         Margin="1"/>
+                         Background="WhiteSmoke"/>
 
             <Button Grid.Column="3"
                     Grid.Row="2"
                     Style="{StaticResource standardButton}"
                     Text="mod"
                     ToolTipProperties.Text="modulo"
+                    FontSize="24"
                     x:Name="btnModulo"
                     Clicked="btnModulo_Clicked"/>
 

@@ -6,10 +6,10 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
+using System.Globalization;
 namespace Calculator;
 
 
-// TODO: TEST ON TARGET !
 // TODO: other feature - better implement them after first release:
 // another chart view
 // both chart and scientific
@@ -29,7 +29,7 @@ public partial class MainPage : ContentPage
     const string MOD = "modulo";
     const string DivisionByZeroText = "Error: division by 0.";
     const string CHART_VIEW = "Chart";
-    const string TEXT_VIEW = "Text";
+    const string SIMPLE_VIEW = "Simple";
     const string SCIENTIFIC_VIEW = "Scientific";
     ObservableCollection<double> LVCValues = new() { 0 };
     const int WindowLength = 100;
@@ -40,7 +40,11 @@ public partial class MainPage : ContentPage
     /// </summary>
     bool OneShot = false;
 
+    /// <summary>
+    /// Binding property for the chart
+    /// </summary>
     public ISeries[] Series { get; set; }
+
 
     public MainPage()
     {
@@ -51,7 +55,7 @@ public partial class MainPage : ContentPage
         // must be set here not in UI
         entryResult.Text = "0";
 
-        pickerView.ItemsSource = new List<string>() { TEXT_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
+        pickerView.ItemsSource = new List<string>() { SIMPLE_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
         pickerView.SelectedIndex = 0;
 
         BindingContext = this;
@@ -330,8 +334,8 @@ public partial class MainPage : ContentPage
 
                 // setul chart view
                 rowInput.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplay1.Height = new GridLength(0.5, GridUnitType.Star);
-                rowDisplay2.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(0.3, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(1, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
                 // reset scientific view
@@ -339,15 +343,15 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                ArrangeEntrys(10, 20, 60, LayoutOptions.End);
+                ArrangeEntrys(10, 30, LayoutOptions.End);
                 break;
 
-            case TEXT_VIEW:
+            case SIMPLE_VIEW:
 
                 // reset chart view
                 rowInput.Height = new GridLength(1.5, GridUnitType.Star);
-                rowDisplay1.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplay2.Height = new GridLength(0, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(0, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
                 // reset scientific view
@@ -355,9 +359,7 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                entryCalculation.FontSize = 15;
-                entryResult.FontSize = 35;
-                ArrangeEntrys(15, 35, -1, LayoutOptions.Fill);
+                ArrangeEntrys(20, 50, LayoutOptions.Fill);
                 break;
 
             case SCIENTIFIC_VIEW:
@@ -368,27 +370,24 @@ public partial class MainPage : ContentPage
 
                 // reset chart view
                 rowInput.Height = new GridLength(1.5, GridUnitType.Star);
-                rowDisplay1.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplay2.Height = new GridLength(0, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(1, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(0, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
-                ArrangeEntrys(15, 35, -1, LayoutOptions.Fill);
+                ArrangeEntrys(20, 50, LayoutOptions.Fill);
                 break;
         }
     }
 
     private void ArrangeEntrys(double fontSizeCalculation, 
-                               double fontSizeResult, 
-                               double widthRequest, 
+                               double fontSizeResult,
                                LayoutOptions layoutOptions)
     {
         // modify the entries
         entryCalculation.FontSize = fontSizeCalculation;
-        entryCalculation.WidthRequest = widthRequest;
         entryCalculation.HorizontalOptions = layoutOptions;
 
         entryResult.FontSize = fontSizeResult;
-        entryResult.WidthRequest = widthRequest;
         entryResult.HorizontalOptions = layoutOptions;
     }
 
@@ -461,7 +460,7 @@ public partial class MainPage : ContentPage
 
     private void btnE_Clicked(object sender, EventArgs e)
     {
-        entryResult.Text = Math.E.ToString();
+        entryResult.Text = ToCustomString(Math.E);
     }
 
     private void btnLn_Clicked(object sender, EventArgs e)
@@ -506,7 +505,7 @@ public partial class MainPage : ContentPage
 
     private void btnPi_Clicked(object sender, EventArgs e)
     {
-        entryResult.Text = Math.PI.ToString();
+        entryResult.Text = ToCustomString(Math.PI);
     }
 
     private void btnSin_Clicked(object sender, EventArgs e)
@@ -515,8 +514,7 @@ public partial class MainPage : ContentPage
 
         if (double.TryParse(entryResult.Text, out double result))
         {
-            entryResult.Text = ToCustomString(Math.Sin(result))
-                ;
+            entryResult.Text = ToCustomString(Math.Sin(result));
         }
     }
 
@@ -597,7 +595,10 @@ public partial class MainPage : ContentPage
 
     private string ToCustomString(double input)
     {
-        return input.ToString("#,##0.##########");
+        if (input < 1e12)
+            return input.ToString("#,##0.##########");
+        else
+            return input.ToString("E", CultureInfo.InvariantCulture);
     }
 
     private void btnModulo_Clicked(object sender, EventArgs e)
