@@ -8,8 +8,8 @@
     MaximumWidthRequest="300">
 
     <ShellContent Title="Simple view"
-                      Shell.NavBarIsVisible="False" 
-                      ContentTemplate="{DataTemplate local:MainPage}"
-                      Route="MainPage"/>
+                  Shell.NavBarIsVisible="False" 
+                  ContentTemplate="{DataTemplate local:MainPage}"
+                  Route="MainPage"/>
 
 </Shell>

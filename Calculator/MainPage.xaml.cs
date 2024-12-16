@@ -530,7 +530,7 @@ public partial class MainPage : ContentPage
 
     private void btnTg_Clicked(object sender, EventArgs e)
     {
-        entryCalculation.Text = $"cos({entryResult.Text})";
+        entryCalculation.Text = $"tg({entryResult.Text})";
 
         if (double.TryParse(entryResult.Text, out double result))
         {
@@ -540,7 +540,7 @@ public partial class MainPage : ContentPage
 
     private void btnCtg_Clicked(object sender, EventArgs e)
     {
-        entryCalculation.Text = $"cos({entryResult.Text})";
+        entryCalculation.Text = $"ctg({entryResult.Text})";
 
         if (double.TryParse(entryResult.Text, out double result))
         {
@@ -604,6 +604,11 @@ public partial class MainPage : ContentPage
     private void btnModulo_Clicked(object sender, EventArgs e)
     {
         BuildOperation(MOD);
+    }
+
+    private void btnAbout_Clicked(object sender, EventArgs e)
+    {
+        Navigation.PushAsync(new AboutPage());
     }
 }
 
