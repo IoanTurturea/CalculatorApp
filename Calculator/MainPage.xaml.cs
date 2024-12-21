@@ -33,6 +33,10 @@ public partial class MainPage : ContentPage
     const string SCIENTIFIC_VIEW = "Scientific";
     ObservableCollection<double> LVCValues = new() { 0 };
     const int WindowLength = 100;
+    const double EntryCalculationChartFont = 20;
+    const double EntryResultChartFont = 30;
+    const double EntryCalculationNormalFont = 20;
+    const double EntryResultNormalFont = 50;
 
     /// <summary>
     /// Flag to indicate equal was pressed. Different than checking the entry calculation contains =
@@ -44,6 +48,8 @@ public partial class MainPage : ContentPage
     /// Binding property for the chart
     /// </summary>
     public ISeries[] Series { get; set; }
+
+    public double StandardButtonFontSize { get; set; } = 20;
 
 
     public MainPage()
@@ -57,6 +63,21 @@ public partial class MainPage : ContentPage
 
         pickerView.ItemsSource = new List<string>() { SIMPLE_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
         pickerView.SelectedIndex = 0;
+
+        var resource = FindByName("standardButton") as Style;
+        
+        if (DeviceInfo.Current.Idiom == DeviceIdiom.Phone)
+        {
+            StandardButtonFontSize = 30;
+        }
+        else if (DeviceInfo.Current.Idiom == DeviceIdiom.Tablet)
+        {
+            StandardButtonFontSize = 20;
+        }
+        else if (DeviceInfo.Current.Idiom == DeviceIdiom.Desktop)
+        {
+            StandardButtonFontSize = 40;
+        }
 
         BindingContext = this;
     }
@@ -330,11 +351,12 @@ public partial class MainPage : ContentPage
 
         switch (item)
         {
+            // TODO: consider removing hardcodings from here
             case CHART_VIEW:
 
                 // setul chart view
                 rowInput.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(0.3, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(0.4, GridUnitType.Star);
                 rowDisplayChart.Height = new GridLength(1, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
@@ -343,7 +365,7 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                ArrangeEntrys(10, 30, LayoutOptions.End);
+                ArrangeEntrys(EntryCalculationChartFont, EntryResultChartFont, LayoutOptions.End);
                 break;
 
             case SIMPLE_VIEW:
@@ -359,7 +381,7 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                ArrangeEntrys(20, 50, LayoutOptions.Fill);
+                ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
                 break;
 
             case SCIENTIFIC_VIEW:
@@ -374,7 +396,7 @@ public partial class MainPage : ContentPage
                 rowDisplayChart.Height = new GridLength(0, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
-                ArrangeEntrys(20, 50, LayoutOptions.Fill);
+                ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
                 break;
         }
     }

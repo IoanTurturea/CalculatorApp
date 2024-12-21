@@ -9,19 +9,23 @@
         <Style TargetType="Button" x:Key="standardButton">
             <Setter Property="Background" Value="WhiteSmoke"/>
             <Setter Property="TextColor" Value="Black"/>
-            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontSize" Value="{Binding StandardButtonFontSize}"/>
+            <Setter Property="Margin" Value="1"/>
         </Style>
         
         <Style TargetType="Button" x:Key="symbolAndLogButton">
             <Setter Property="Background" Value="Beige"/>
             <Setter Property="TextColor" Value="Black"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Margin" Value="1"/>
         </Style>
 
         <Style TargetType="ImageButton" x:Key="powerButton">
             <Setter Property="Background" Value="OrangeRed"/>
             <Setter Property="Aspect" Value="AspectFit"/>
             <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Margin" Value="1"/>
         </Style>
     </ContentPage.Resources>
     
@@ -80,13 +84,11 @@
 
             <Entry x:Name="entryCalculation"
                    Grid.Row="0"
-                   FontSize="{Binding FontSizeEntryCalculation}"
                    HorizontalTextAlignment="End"
                    IsReadOnly="True"/>
 
             <Entry x:Name="entryResult"
                    Grid.Row="1"
-                   FontSize="{Binding FontSizeEntryResult}"
                    HorizontalTextAlignment="End"
                    TextChanged="entryResult_TextChanged"
                    IsReadOnly="True"/>
@@ -173,6 +175,7 @@
                     Text="sin"
                     x:Name="btnSin"
                     Clicked="btnSin_Clicked"
+                    Margin="1"
                     FontSize="20"/>
 
             <Button Grid.Column="1"
@@ -180,6 +183,7 @@
                     Text="cos"
                     x:Name="btnCos"
                     Clicked="btnCos_Clicked"
+                    Margin="1"
                     FontSize="20"/>
 
             <Button Grid.Column="2"
@@ -187,6 +191,7 @@
                     Text="tg"
                     x:Name="btnTg"
                     Clicked="btnTg_Clicked"
+                    Margin="1"
                     FontSize="20"/>
 
             <Button Grid.Column="3"
@@ -194,6 +199,7 @@
                     Text="ctg"
                     x:Name="btnCtg"
                     Clicked="btnCtg_Clicked"
+                    Margin="1"
                     FontSize="20"/>
 
             <ImageButton Grid.Column="4"
@@ -201,7 +207,7 @@
                          x:Name="btnPi"
                          Clicked="btnPi_Clicked"
                          Source="pi.png"
-                         Padding="15"
+                         Padding="20"
                          Margin="1"
                          CornerRadius="5"
                          Background="#5829CE"
@@ -216,8 +222,6 @@
                              x:Name="btn10LaX"
                              Clicked="btn10LaX_Clicked"
                              Source="zece_la_x.png"
-                             Padding="5"
-                             Margin="1"
                              Style="{StaticResource powerButton}"/>
 
                 <ImageButton Grid.Column="0"
@@ -225,8 +229,6 @@
                              x:Name="btn2LaX"
                              Clicked="btn2LaX_Clicked"
                              Source="doi_la_x.png"
-                             Padding="5"
-                             Margin="1"
                              Style="{StaticResource powerButton}"/>
 
                 <ImageButton Grid.Column="0"
@@ -234,8 +236,6 @@
                              x:Name="btnSqrt"
                              Clicked="btnSqrt_Clicked"
                              Source="sqrt.png"
-                             Padding="5"
-                             Margin="1"
                              Style="{StaticResource powerButton}"/>
 
                 <ImageButton Grid.Column="0"
@@ -243,8 +243,6 @@
                              x:Name="btnXla2"
                              Clicked="btnXla2_Clicked"
                              Source="x_la_doi.png"
-                             Padding="5"
-                             Margin="1"
                              Style="{StaticResource powerButton}"/>
 
                 <ImageButton Grid.Column="0"
@@ -252,8 +250,6 @@
                              x:Name="btnXlaY"
                              Clicked="btnXlaY_Clicked"
                              Source="x_la_y.png"
-                             Padding="5"
-                             Margin="1"
                              Style="{StaticResource powerButton}"/>
 
             <!--End of the column-->
@@ -267,7 +263,6 @@
                     FontAttributes="Bold"
                     Background="LightBlue"
                     Text="C"
-                    FontSize="40"
                     Clicked="btnClear_Clicked"/>
 
             <Button Grid.Column="3"
@@ -284,6 +279,7 @@
                          Source="back.png"
                          Padding="20"
                          CornerRadius="5"
+                         Margin="1"
                          Background="WhiteSmoke"/>
 
             <Button Grid.Column="3"
@@ -291,7 +287,6 @@
                     Style="{StaticResource standardButton}"
                     Text="mod"
                     ToolTipProperties.Text="modulo"
-                    FontSize="24"
                     x:Name="btnModulo"
                     Clicked="btnModulo_Clicked"/>
 

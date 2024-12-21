@@ -32,43 +32,43 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
-	  <ApplicationId>Turtledove apps</ApplicationId>
+	  <ApplicationId>turtledove</ApplicationId>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\icon.svg"/>
+		<MauiIcon Include="Resources\AppIcon\icon.svg" />
 		
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\AppIcon\icon.svg"/>
+		<MauiSplashScreen Include="Resources\AppIcon\icon.svg" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
