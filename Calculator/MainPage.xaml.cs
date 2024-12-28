@@ -39,10 +39,10 @@ public partial class MainPage : ContentPage
     const double EntryResultNormalFont = 50;
 
     /// <summary>
-    /// Flag to indicate equal was pressed. Different than checking the entry calculation contains =
-    /// because this flag resets after each usage
+    /// Flag to indicate equal was pressed. Different than checking the entry calculation
+    ///  contains "=" because this flag resets after each usage
     /// </summary>
-    bool OneShot = false;
+    bool EqualWasPressed = false;
 
     /// <summary>
     /// Binding property for the chart
@@ -50,6 +50,16 @@ public partial class MainPage : ContentPage
     public ISeries[] Series { get; set; }
 
     public double StandardButtonFontSize { get; set; } = 20;
+
+    bool ClearEntryText = false;
+
+    const double ChartViewRowInput = 1;
+    const double ChartViewRowDisplayText = 0.5;
+    const double ChartViewRowDisplayChart = 1;
+
+    const double OtherViewsRowInput = 1.5;
+    const double OtherViewsRowDisplayText = 1;
+    const double OtherViewsRowDisplayChart = 0;
 
 
     public MainPage()
@@ -123,12 +133,12 @@ public partial class MainPage : ContentPage
             EnableAllButtons(true);
         }
 
-        entryCalculation.Text = string.Empty;
+        entryCalculation.Text = "0";
         entryResult.Text = "0";
         RetainFirstOperand = 0;
         RetainSecondOperand = 0;
         Operation = string.Empty;
-        OneShot = true;
+        ClearEntryText = false;
 
         InitializeChart();
         LVCValues.Clear();
@@ -219,7 +229,7 @@ public partial class MainPage : ContentPage
         // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
         // which does nothing
 
-        OneShot = false;
+        ClearEntryText = true;
     }
 
     private void BuildOperation(string in_operator)
@@ -241,7 +251,6 @@ public partial class MainPage : ContentPage
             RetainFirstOperand = result;
 
             entryCalculation.Text = $"{result} {in_operator}";
-            entryResult.Text = string.Empty;
         }
         else
         {
@@ -254,6 +263,7 @@ public partial class MainPage : ContentPage
         }
 
         Operation = in_operator;
+        ClearEntryText = true;
     }
 
     private double DuplicateCodeAboutOperations()
@@ -355,9 +365,9 @@ public partial class MainPage : ContentPage
             case CHART_VIEW:
 
                 // setul chart view
-                rowInput.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(0.4, GridUnitType.Star);
-                rowDisplayChart.Height = new GridLength(1, GridUnitType.Star);
+                rowInput.Height = new GridLength(ChartViewRowInput, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
                 // reset scientific view
@@ -371,9 +381,9 @@ public partial class MainPage : ContentPage
             case SIMPLE_VIEW:
 
                 // reset chart view
-                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplayChart.Height = new GridLength(0, GridUnitType.Star);
+                rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(OtherViewsRowDisplayChart, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
                 // reset scientific view
@@ -391,9 +401,9 @@ public partial class MainPage : ContentPage
                 columnScientificLeft.Width = new GridLength(1, GridUnitType.Star);
 
                 // reset chart view
-                rowInput.Height = new GridLength(1.5, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(1, GridUnitType.Star);
-                rowDisplayChart.Height = new GridLength(0, GridUnitType.Star);
+                rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
+                rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
+                rowDisplayChart.Height = new GridLength(OtherViewsRowDisplayChart, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
                 ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
@@ -429,33 +439,31 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            if (!OneShot)
+            if (ClearEntryText)
             {
-                entryResult.Text = in_digit;
-                OneShot = true;
+                entryResult.Text = string.Empty;
+                ClearEntryText = false;
+            }
+
+            string concat = entryResult.Text + in_digit;
+            int index = concat.IndexOf('.');
+            string newConcat = string.Empty;
+            if (index != -1)
+            {
+                newConcat = concat.Remove(index);
+            }
+
+            if (newConcat.Length > thousandDigits)
+            {
+                entryResult.Text = concat;
+            }
+            else if (!concat.Contains('.') && (concat.Length > thousandDigits))
+            {
+                entryResult.Text = $"{decimal.Parse(concat):N0}";
             }
             else
             {
-                string concat = entryResult.Text + in_digit;
-                int index = concat.IndexOf('.');
-                string newConcat = string.Empty;
-                if (index != -1)
-                {
-                    newConcat = concat.Remove(index);
-                }
-
-                if (newConcat.Length > thousandDigits)
-                {
-                    entryResult.Text = concat;
-                }
-                else if (!concat.Contains('.') && (concat.Length > thousandDigits))
-                {
-                    entryResult.Text = $"{decimal.Parse(concat):N0}";
-                }
-                else
-                {
-                    entryResult.Text = concat;
-                }
+                entryResult.Text = concat;
             }
         }
     }

@@ -85,7 +85,8 @@
             <Entry x:Name="entryCalculation"
                    Grid.Row="0"
                    HorizontalTextAlignment="End"
-                   IsReadOnly="True"/>
+                   IsReadOnly="True"
+                   Text="0"/>
 
             <Entry x:Name="entryResult"
                    Grid.Row="1"
