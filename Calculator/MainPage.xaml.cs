@@ -39,12 +39,6 @@ public partial class MainPage : ContentPage
     const double EntryResultNormalFont = 50;
 
     /// <summary>
-    /// Flag to indicate equal was pressed. Different than checking the entry calculation
-    ///  contains "=" because this flag resets after each usage
-    /// </summary>
-    bool EqualWasPressed = false;
-
-    /// <summary>
     /// Binding property for the chart
     /// </summary>
     public ISeries[] Series { get; set; }
@@ -62,6 +56,7 @@ public partial class MainPage : ContentPage
     const double OtherViewsRowDisplayChart = 0;
 
 
+
     public MainPage()
     {
         InitializeComponent();
@@ -73,21 +68,6 @@ public partial class MainPage : ContentPage
 
         pickerView.ItemsSource = new List<string>() { SIMPLE_VIEW, SCIENTIFIC_VIEW, CHART_VIEW };
         pickerView.SelectedIndex = 0;
-
-        var resource = FindByName("standardButton") as Style;
-        
-        if (DeviceInfo.Current.Idiom == DeviceIdiom.Phone)
-        {
-            StandardButtonFontSize = 30;
-        }
-        else if (DeviceInfo.Current.Idiom == DeviceIdiom.Tablet)
-        {
-            StandardButtonFontSize = 20;
-        }
-        else if (DeviceInfo.Current.Idiom == DeviceIdiom.Desktop)
-        {
-            StandardButtonFontSize = 40;
-        }
 
         BindingContext = this;
     }
@@ -639,6 +619,18 @@ public partial class MainPage : ContentPage
     private void btnAbout_Clicked(object sender, EventArgs e)
     {
         Navigation.PushAsync(new AboutPage());
+    }
+
+    private void ContentPage_SizeChanged(object sender, EventArgs e)
+    {
+        switch (DeviceDisplay.Current.MainDisplayInfo.Orientation)
+        {
+            case DisplayOrientation.Landscape: 
+                StandardButtonFontSize = 10;
+                //btnAbout.Aspect = 
+                break;
+            case DisplayOrientation.Portrait: StandardButtonFontSize = 20; break;
+        }
     }
 }
 
