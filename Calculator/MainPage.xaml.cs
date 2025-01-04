@@ -43,16 +43,24 @@ public partial class MainPage : ContentPage
     /// </summary>
     public ISeries[] Series { get; set; }
 
-    public double StandardButtonFontSize { get; set; } = 20;
+    private readonly BindableProperty FontSizeFunction = BindableProperty.Create(nameof(StandardButtonFontSize), typeof(double), typeof(MainPage), (double)20);
+    public double StandardButtonFontSize
+    {
+        get => (double)GetValue(FontSizeFunction);
+        set => SetValue(FontSizeFunction, value);
+    }
 
     bool ClearEntryText = false;
 
     const double ChartViewRowInput = 1;
     const double ChartViewRowDisplayText = 0.5;
     const double ChartViewRowDisplayChart = 1;
+    const double ChartViewRowDisplayTextWhenLandScape = 0;
+    const double ChartViewRowDisplayChartWhenLandScape = ChartViewRowDisplayChart / 2;
 
     const double OtherViewsRowInput = 1.5;
     const double OtherViewsRowDisplayText = 1;
+    const double OtherViewsRowDisplayTextWhenLandScape = OtherViewsRowDisplayText / 2;
     const double OtherViewsRowDisplayChart = 0;
 
 
@@ -344,10 +352,22 @@ public partial class MainPage : ContentPage
             // TODO: consider removing hardcodings from here
             case CHART_VIEW:
 
-                // setul chart view
+                // setup chart view
+                switch (DeviceDisplay.Current.MainDisplayInfo.Orientation)
+                {
+                    case DisplayOrientation.Landscape:
+                        rowDisplayText.Height = new GridLength(ChartViewRowDisplayTextWhenLandScape, GridUnitType.Star);
+                        rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChartWhenLandScape, GridUnitType.Star);
+                        break;
+
+                    case DisplayOrientation.Portrait:
+                        rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
+                        rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
+                        ArrangeEntrys(EntryCalculationChartFont, EntryResultChartFont, LayoutOptions.End);
+                        break;
+                }
+
                 rowInput.Height = new GridLength(ChartViewRowInput, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
-                rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
                 // reset scientific view
@@ -355,7 +375,6 @@ public partial class MainPage : ContentPage
                 rowScientific1.Height = new GridLength(0);
                 columnScientificLeft.Width = new GridLength(0);
 
-                ArrangeEntrys(EntryCalculationChartFont, EntryResultChartFont, LayoutOptions.End);
                 break;
 
             case SIMPLE_VIEW:
@@ -375,18 +394,29 @@ public partial class MainPage : ContentPage
                 break;
 
             case SCIENTIFIC_VIEW:
+
+                // reset chart view
+                switch (DeviceDisplay.Current.MainDisplayInfo.Orientation)
+                {
+                    case DisplayOrientation.Landscape:
+                        rowDisplayText.Height = new GridLength(OtherViewsRowDisplayTextWhenLandScape, GridUnitType.Star);
+                        ArrangeEntrys(EntryCalculationNormalFont / 2, EntryResultNormalFont / 2, LayoutOptions.Fill);
+                        break;
+
+                    case DisplayOrientation.Portrait:
+                        rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
+                        ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
+                        break;
+                }
                 // setup scientific view
                 rowScientific0.Height = new GridLength(1, GridUnitType.Star);
                 rowScientific1.Height = new GridLength(1, GridUnitType.Star);
                 columnScientificLeft.Width = new GridLength(1, GridUnitType.Star);
 
-                // reset chart view
                 rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
-                rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
                 rowDisplayChart.Height = new GridLength(OtherViewsRowDisplayChart, GridUnitType.Star);
                 gridChart.IsVisible = false;
 
-                ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
                 break;
         }
     }
@@ -625,11 +655,35 @@ public partial class MainPage : ContentPage
     {
         switch (DeviceDisplay.Current.MainDisplayInfo.Orientation)
         {
-            case DisplayOrientation.Landscape: 
+            case DisplayOrientation.Landscape:
                 StandardButtonFontSize = 10;
-                //btnAbout.Aspect = 
+
+                if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == CHART_VIEW)
+                {
+                    rowDisplayText.Height = new GridLength(ChartViewRowDisplayTextWhenLandScape, GridUnitType.Star);
+                    rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChartWhenLandScape, GridUnitType.Star);
+                }
+                else if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == SCIENTIFIC_VIEW)
+                {
+                    rowDisplayText.Height = new GridLength(OtherViewsRowDisplayTextWhenLandScape, GridUnitType.Star);
+                    ArrangeEntrys(EntryCalculationNormalFont / 2, EntryResultNormalFont / 2, LayoutOptions.Fill);
+                }
                 break;
-            case DisplayOrientation.Portrait: StandardButtonFontSize = 20; break;
+
+            case DisplayOrientation.Portrait:
+                StandardButtonFontSize = 20;
+
+                if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == CHART_VIEW)
+                {
+                    rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
+                    rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
+                }
+                else if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == SCIENTIFIC_VIEW)
+                {
+                    rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
+                    ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
+                }
+                break;
         }
     }
 }
