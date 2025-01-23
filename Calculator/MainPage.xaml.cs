@@ -53,6 +53,7 @@ public partial class MainPage : ContentPage
     bool ClearEntryText = false;
 
     const double ChartViewRowInput = 1;
+    const double ChartViewRowInputWhenLandscape = ChartViewRowInput / 2;
     const double ChartViewRowDisplayText = 0.5;
     const double ChartViewRowDisplayChart = 1;
     const double ChartViewRowDisplayTextWhenLandScape = 0;
@@ -349,7 +350,6 @@ public partial class MainPage : ContentPage
 
         switch (item)
         {
-            // TODO: consider removing hardcodings from here
             case CHART_VIEW:
 
                 // setup chart view
@@ -358,16 +358,17 @@ public partial class MainPage : ContentPage
                     case DisplayOrientation.Landscape:
                         rowDisplayText.Height = new GridLength(ChartViewRowDisplayTextWhenLandScape, GridUnitType.Star);
                         rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChartWhenLandScape, GridUnitType.Star);
+                        rowInput.Height = new GridLength(ChartViewRowInputWhenLandscape, GridUnitType.Star);
                         break;
 
                     case DisplayOrientation.Portrait:
                         rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
                         rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
                         ArrangeEntrys(EntryCalculationChartFont, EntryResultChartFont, LayoutOptions.End);
+                        rowInput.Height = new GridLength(ChartViewRowInput, GridUnitType.Star);
                         break;
                 }
 
-                rowInput.Height = new GridLength(ChartViewRowInput, GridUnitType.Star);
                 gridChart.IsVisible = true;
 
                 // reset scientific view
@@ -662,11 +663,17 @@ public partial class MainPage : ContentPage
                 {
                     rowDisplayText.Height = new GridLength(ChartViewRowDisplayTextWhenLandScape, GridUnitType.Star);
                     rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChartWhenLandScape, GridUnitType.Star);
+                    rowInput.Height = new GridLength(ChartViewRowInputWhenLandscape, GridUnitType.Star);
                 }
                 else if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == SCIENTIFIC_VIEW)
                 {
                     rowDisplayText.Height = new GridLength(OtherViewsRowDisplayTextWhenLandScape, GridUnitType.Star);
                     ArrangeEntrys(EntryCalculationNormalFont / 2, EntryResultNormalFont / 2, LayoutOptions.Fill);
+                    rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
+                }
+                else // means simple
+                {
+                    rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
                 }
                 break;
 
@@ -677,14 +684,25 @@ public partial class MainPage : ContentPage
                 {
                     rowDisplayText.Height = new GridLength(ChartViewRowDisplayText, GridUnitType.Star);
                     rowDisplayChart.Height = new GridLength(ChartViewRowDisplayChart, GridUnitType.Star);
+                    rowInput.Height = new GridLength(ChartViewRowInput, GridUnitType.Star);
                 }
                 else if ((string)pickerView.ItemsSource[pickerView.SelectedIndex] == SCIENTIFIC_VIEW)
                 {
                     rowDisplayText.Height = new GridLength(OtherViewsRowDisplayText, GridUnitType.Star);
                     ArrangeEntrys(EntryCalculationNormalFont, EntryResultNormalFont, LayoutOptions.Fill);
+                    rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
+                }
+                else // means simple
+                {
+                    rowInput.Height = new GridLength(OtherViewsRowInput, GridUnitType.Star);
                 }
                 break;
         }
+    }
+
+    private void btnCancelLabel_Clicked(object sender, EventArgs e)
+    {
+        rowLabelInformation.Height = new GridLength(0, GridUnitType.Star);
     }
 }
 

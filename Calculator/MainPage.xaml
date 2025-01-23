@@ -97,8 +97,34 @@
         <Grid Grid.Row="2"
               x:Name="gridChart"
               IsVisible="False">
-            <lvc:CartesianChart Series="{Binding Series}"
-                                ZoomMode="Both"/>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="20" x:Name="rowLabelInformation"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <lvc:CartesianChart Series="{Binding Series}"
+                ZoomMode="ZoomX"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
+                
+                <Label Text="You can also add points by pressing Enter. Also you can zoom."
+                       Grid.Column="0"/>
+
+                <ImageButton Grid.Column="1"
+                             x:Name="btnCancelLabel"
+                             Clicked="btnCancelLabel_Clicked"
+                             Source="cancel.png"
+                             Aspect="AspectFit"
+                             HorizontalOptions="End"/>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="3"
