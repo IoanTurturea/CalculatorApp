@@ -654,6 +654,11 @@ public partial class MainPage : ContentPage
 
     private void ContentPage_SizeChanged(object sender, EventArgs e)
     {
+        if(null == pickerView.ItemsSource[pickerView.SelectedIndex])
+        {
+            return;
+        }
+
         switch (DeviceDisplay.Current.MainDisplayInfo.Orientation)
         {
             case DisplayOrientation.Landscape:

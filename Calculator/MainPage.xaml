@@ -104,7 +104,7 @@
 
             <Grid Grid.Row="0">
                 <lvc:CartesianChart Series="{Binding Series}"
-                ZoomMode="ZoomX"/>
+                ZoomMode="X"/>
             </Grid>
 
             <Grid Grid.Row="1">
@@ -115,7 +115,7 @@
                     </Grid.ColumnDefinitions>
                 </Grid>
                 
-                <Label Text="You can also add points by pressing Enter. Also you can zoom."
+                <Label Text="You can also add simple numbers and you can zoom."
                        Grid.Column="0"/>
 
                 <ImageButton Grid.Column="1"
