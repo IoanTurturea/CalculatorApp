@@ -70,7 +70,7 @@
                          Clicked="btnAbout_Clicked"
                          Source="info.png"
                          Aspect="AspectFit"
-                         WidthRequest="50"/>
+                         WidthRequest="40"/>
         </Grid>
         
         <Grid Grid.Row="1"
@@ -107,7 +107,8 @@
                 ZoomMode="X"/>
             </Grid>
 
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1"
+                  Background="LightGreen">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -115,7 +116,7 @@
                     </Grid.ColumnDefinitions>
                 </Grid>
                 
-                <Label Text="You can also add simple numbers and you can zoom."
+                <Label Text=" Press Equal to simply input numbers. Also you can zoom."
                        Grid.Column="0"/>
 
                 <ImageButton Grid.Column="1"
@@ -187,8 +188,8 @@
                          x:Name="btnExp"
                          Clicked="btnExp_Clicked"
                          Source="e_la_x.png"
-                         
                          Margin="1"
+                         CornerRadius="5"
                          Aspect="AspectFit"
                          Background="Beige"/>
 

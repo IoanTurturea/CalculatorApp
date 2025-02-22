@@ -7,6 +7,7 @@ using SkiaSharp;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Tracing;
 using System.Globalization;
+using static SkiaSharp.HarfBuzz.SKShaper;
 namespace Calculator;
 
 
@@ -212,7 +213,8 @@ public partial class MainPage : ContentPage
                 entryCalculation.Text = $"{RetainFirstOperand} {Operation} {RetainSecondOperand} =";
             }
 
-            DuplicateCodeAboutOperations();
+            var point = DuplicateCodeAboutOperations();
+            InputPointOnChart(point);
         }
 
         // the else case happens if user changes operator (+, -, *, /, ^) and presses equal
@@ -299,26 +301,22 @@ public partial class MainPage : ContentPage
                 break;
         }
 
-        if (Operation != DIV || RetainSecondOperand != 0)
+        if ((Operation != DIV) || (RetainSecondOperand != 0))
         {
             entryResult.Text = ToCustomString(result);
         }
 
-        if (string.Empty == Operation)
-        {
-            LVCValues.Add(RetainSecondOperand);
-        }
-        else
-        {
-            LVCValues.Add(result);
-        }
+        return result;
+    }
+
+    private void InputPointOnChart(double input)
+    {
+        LVCValues.Add(input);
 
         if (LVCValues.Count > WindowLength)
         {
             LVCValues.RemoveAt(0);
         }
-
-        return result;
     }
 
     private void DivisionByZero()
@@ -637,9 +635,9 @@ public partial class MainPage : ContentPage
     private string ToCustomString(double input)
     {
         if (input < 1e12)
-            return input.ToString("#,##0.##########");
+            return input.ToString("#,##0.#########");
         else
-            return input.ToString("E", CultureInfo.InvariantCulture);
+            return input.ToString("E", new CultureInfo("en-US"));
     }
 
     private void btnModulo_Clicked(object sender, EventArgs e)

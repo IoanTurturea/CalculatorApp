@@ -3,12 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Calculator.AboutPage"
              Title="AboutPage">
+
     <VerticalStackLayout>
-        <VerticalStackLayout>
-            <Label Text="Version 1.0.0" HorizontalOptions="Center"/>
-            <Label Text="Updated: december 2024" HorizontalOptions="Center"/>
-            <Label Text="This app uses library LiveCharts(2) - MIT license" HorizontalOptions="Center"/>
-            <Label Text="https://livecharts.dev/" HorizontalOptions="Center"/>
-        </VerticalStackLayout>
+        <Label Text="Version 1.0.0" HorizontalOptions="Center"/>
+        <Label Text="Updated: december 2024" HorizontalOptions="Center"/>
+        <Label Text="This app uses library LiveCharts(2) - MIT license" HorizontalOptions="Center"/>
+        <Label Text="https://livecharts.dev/" HorizontalOptions="Center"/>
+        <Label Text=""/>
+        <Label Text="3 views are possible:" HorizontalOptions="Center"/>
+        <Label Text=" - simple" HorizontalOptions="Center"/>
+        <Label Text=" - scientific" HorizontalOptions="Center"/>
+        <Label Text=" - charts" HorizontalOptions="Center"/>
+        <Label Text=""/>
+        <Label Text="In the chart view, you can visualize inputed or calculated numbers." HorizontalOptions="Center"/>
+        <Label Text="This shows a graphic representation of your inputs." HorizontalOptions="Center"/>
+        <Label Text="You can simply press Equal to input a number on the chart." HorizontalOptions="Center"/>
+        <Label Text="Also you can zoom and pan." HorizontalOptions="Center"/>
     </VerticalStackLayout>
 </ContentPage>
