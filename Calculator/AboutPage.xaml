@@ -15,7 +15,7 @@
         <Label Text=" - scientific" HorizontalOptions="Center"/>
         <Label Text=" - charts" HorizontalOptions="Center"/>
         <Label Text=""/>
-        <Label Text="In the chart view, you can visualize inputed or calculated numbers." HorizontalOptions="Center"/>
+        <Label Text="In chart view, you can visualize inputed or calculated numbers." HorizontalOptions="Center"/>
         <Label Text="This shows a graphic representation of your inputs." HorizontalOptions="Center"/>
         <Label Text="You can simply press Equal to input a number on the chart." HorizontalOptions="Center"/>
         <Label Text="Also you can zoom and pan." HorizontalOptions="Center"/>

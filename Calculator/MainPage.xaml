@@ -108,7 +108,8 @@
             </Grid>
 
             <Grid Grid.Row="1"
-                  Background="LightGreen">
+                  Background="LightGreen"
+                  Margin="1,0,2,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>

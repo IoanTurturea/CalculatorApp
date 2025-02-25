@@ -28,6 +28,7 @@ public partial class MainPage : ContentPage
     const string DIV = "/";
     const string POW = "^";
     const string MOD = "modulo";
+    const string DOT = ".";
     const string DivisionByZeroText = "Error: division by 0.";
     const string CHART_VIEW = "Chart";
     const string SIMPLE_VIEW = "Simple";
@@ -38,6 +39,9 @@ public partial class MainPage : ContentPage
     const double EntryResultChartFont = 30;
     const double EntryCalculationNormalFont = 20;
     const double EntryResultNormalFont = 50;
+    const int ThousandDigits = 3;
+    const int MaxInputChars = 14;
+    CultureInfo Culture = new CultureInfo("en-US");
 
     /// <summary>
     /// Binding property for the chart
@@ -434,8 +438,6 @@ public partial class MainPage : ContentPage
 
     private void AddDigit(string in_digit)
     {
-        const int thousandDigits = 3;
-
         if (entryResult.Text == "0")
         {
             entryResult.Text = in_digit;
@@ -443,6 +445,7 @@ public partial class MainPage : ContentPage
         else if (entryResult.Text == DivisionByZeroText)
         {
             btnClear_Clicked(null, null);
+            
             // must be after the clear click event 
             entryResult.Text = string.Empty;
         }
@@ -454,21 +457,26 @@ public partial class MainPage : ContentPage
                 ClearEntryText = false;
             }
 
+            if(entryResult.Text.Length >= MaxInputChars)
+            {
+                return;
+            }
+
             string concat = entryResult.Text + in_digit;
-            int index = concat.IndexOf('.');
+            int index = concat.IndexOf(DOT);
             string newConcat = string.Empty;
             if (index != -1)
             {
                 newConcat = concat.Remove(index);
             }
 
-            if (newConcat.Length > thousandDigits)
+            if (newConcat.Length > ThousandDigits)
             {
                 entryResult.Text = concat;
             }
-            else if (!concat.Contains('.') && (concat.Length > thousandDigits))
+            else if (!concat.Contains(DOT) && (concat.Length > ThousandDigits))
             {
-                entryResult.Text = $"{decimal.Parse(concat):N0}";
+                entryResult.Text = $"{decimal.Parse(concat, Culture):N0}";
             }
             else
             {
@@ -637,7 +645,7 @@ public partial class MainPage : ContentPage
         if (input < 1e12)
             return input.ToString("#,##0.#########");
         else
-            return input.ToString("E", new CultureInfo("en-US"));
+            return input.ToString("E", Culture);
     }
 
     private void btnModulo_Clicked(object sender, EventArgs e)
